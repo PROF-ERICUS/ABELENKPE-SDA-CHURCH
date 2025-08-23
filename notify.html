@@ -208,7 +208,7 @@ document.getElementById("sendSMS").addEventListener("click", function () {
     const smsPromises = list.map(a => {
         // Convert to international format
         const phone = a.phone.startsWith("0") ? "233" + a.phone.substring(1) : a.phone;
-        const msg = `Hi ${a.fullName}, Top Ministries International missed you at church today 🙏. Hope you're doing well`;
+        const msg = `Hi ${a.fullName}, Abelenkpe SDA Church missed you at church today 🙏. Hope you're doing well`;
 
         // Call PHP proxy
         return fetch("send_sms.php", {
@@ -242,7 +242,7 @@ document.getElementById("sendSMS").addEventListener("click", function () {
     if (!list.length) return showNotification("No absentees selected!", "warning");
     list.forEach(a => {
       const phone = a.phone.replace(/^0/, "+233");
-      const msg = encodeURIComponent(`Hi ${a.fullName}, Top Ministries International missed you at church today 🙏. Hope you're doing well`);
+      const msg = encodeURIComponent(`Hi ${a.fullName},  Abelenkpe SDA Church missed you at church today 🙏. Hope you're doing well`;
       window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
     });
     showNotification("WhatsApp messages opened!", "success");
@@ -277,3 +277,4 @@ document.getElementById("sendSMS").addEventListener("click", function () {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </body>
 </html>
+
