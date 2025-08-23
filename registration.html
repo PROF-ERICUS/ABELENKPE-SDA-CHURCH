@@ -55,21 +55,41 @@
     font-size: 1.2rem;
   }
 
-  main {
-    flex: 1 0 auto;
-    padding-top: 140px;
-    max-width: 900px;
-    margin: auto;
-    backdrop-filter: blur(6px);
+  .card { 
+    background: rgba(255,255,255,0.95); 
+    border-radius: 20px; 
+    padding: 30px; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    animation: slideDown 0.7s ease;
   }
 
-  footer {
-    flex-shrink: 0;
-    background-color: rgba(52, 58, 64, 0.9);
-    color: white;
-    padding: 1rem;
-    text-align: center;
+  @keyframes slideDown {
+    0% { transform: translateY(-50px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
   }
+
+  footer { background:#343a40; color:#fff; text-align:center; padding:1rem; margin-top: 30px; }
+
+  .fade-alert { opacity:1; transition: opacity 1s ease-out; }
+  .fade-alert.hide { opacity:0; }
+
+  /* Back to Top */
+  #backToTop {
+    position: fixed;
+    bottom: 30px;
+    right: 20px;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    padding: 12px 15px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: none;
+    z-index: 999;
+  }
+  #backToTop:hover { background: #218838; }
 </style>
 </head>
 <body>
@@ -80,10 +100,10 @@
     <h3>ABELENKPE SDA CHURCH</h3>
   </div>
   <nav>
-    <a href="index.html" class="btn btn-light btn-sm">Home</a>
-    <a href="registration.html" class="btn btn-light btn-sm">Register</a>
-    <a href="admin-dash.html" class="btn btn-light btn-sm">Admin</a>
-    <a href="session.html" class="btn btn-light btn-sm">Attendance</a>
+    <a href="index.html" class="btn btn-light btn-sm"><i class="fas fa-home"></i> Home</a>
+    <a href="registration.html" class="btn btn-light btn-sm"><i class="fas fa-user-plus"></i> Register</a>
+    <a href="admin-dash.html" class="btn btn-light btn-sm"><i class="fas fa-user-shield"></i> Admin</a>
+    <a href="session.html" class="btn btn-light btn-sm"><i class="fas fa-clipboard-list"></i> Attendance</a>
   </nav>
 </header>
 
@@ -91,22 +111,22 @@
   <div id="alertBox" class="alert alert-success text-center d-none fade-alert"></div>
 
   <div id="registrationClosed" class="alert alert-danger text-center d-none">
-    <i class="bi bi-lock-fill"></i> Registration is currently closed.
+    <i class="fas fa-lock"></i> Registration is currently closed.
   </div>
 
   <div id="registrationCard" class="card">
-    <h4 class="mb-3 text-center">Member Registration</h4>
+    <h4 class="mb-4 text-center"><i class="fas fa-user-plus"></i> Member Registration</h4>
     <form id="regForm">
       <div class="mb-3">
-        <label class="form-label">Full Name</label>
+        <label class="form-label"><i class="fas fa-user"></i> Full Name</label>
         <input type="text" class="form-control" id="fullName" placeholder="Enter your full name" required />
       </div>
       <div class="mb-3">
-        <label class="form-label">Phone</label>
+        <label class="form-label"><i class="fas fa-phone"></i> Phone</label>
         <input type="tel" class="form-control" id="phone" placeholder="e.g. 0541234567" required />
       </div>
       <div class="mb-3">
-        <label class="form-label">Role/Class</label>
+        <label class="form-label"><i class="fas fa-users"></i> Role/Class</label>
         <select id="role" class="form-select" required>
           <option value="">Choose...</option>
           <option>Class 1</option><option>Class 2</option><option>Class 3</option>
@@ -116,15 +136,27 @@
           <option>Other</option>
         </select>
       </div>
+
+      <!-- Dynamic Other Role -->
+      <div class="mb-3 d-none" id="otherRoleContainer">
+        <label class="form-label"><i class="fas fa-question-circle"></i> Specify</label>
+        <select id="otherRole" class="form-select">
+          <option value="">Choose...</option>
+          <option>Visitor</option>
+          <option>Adventist</option>
+          <option>Non-Adventist</option>
+        </select>
+      </div>
+
       <div class="mb-3">
-        <label class="form-label">Gender</label>
+        <label class="form-label"><i class="fas fa-venus-mars"></i> Gender</label>
         <select id="gender" class="form-select" required>
           <option value="">Choose...</option>
           <option>Male</option>
           <option>Female</option>
         </select>
       </div>
-      <button type="submit" class="btn btn-success w-100"><i class="bi bi-person-plus"></i> Register</button>
+      <button type="submit" class="btn btn-success w-100"><i class="fas fa-check-circle"></i> Register</button>
     </form>
   </div>
 </main>
@@ -132,6 +164,9 @@
 <footer>
   &copy; <span id="year"></span> ABELENKPE SDA CHURCH. All Rights Reserved.
 </footer>
+
+<!-- Back to Top Button -->
+<button id="backToTop"><i class="fas fa-arrow-up"></i></button>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -144,13 +179,27 @@ const registrationCard = document.getElementById('registrationCard');
 const registrationClosed = document.getElementById('registrationClosed');
 const alertBox = document.getElementById('alertBox');
 const yearEl = document.getElementById('year');
+const roleSelect = document.getElementById('role');
+const otherRoleContainer = document.getElementById('otherRoleContainer');
+const otherRoleSelect = document.getElementById('otherRole');
+const backToTop = document.getElementById('backToTop');
 yearEl.textContent = new Date().getFullYear();
 
-// Show/hide registration
+// Show registration or closed message
 if (!registrationOpen) {
   registrationCard.classList.add('d-none');
   registrationClosed.classList.remove('d-none');
 }
+
+// Toggle Other Role
+roleSelect.addEventListener('change', () => {
+  if (roleSelect.value === 'Other') {
+    otherRoleContainer.classList.remove('d-none');
+  } else {
+    otherRoleContainer.classList.add('d-none');
+    otherRoleSelect.value = '';
+  }
+});
 
 function showAlert(msg, type='success'){
   alertBox.className = `alert alert-${type} text-center fade-alert`;
@@ -160,16 +209,26 @@ function showAlert(msg, type='success'){
   setTimeout(()=> alertBox.classList.add('d-none'), 4000);
 }
 
+// Handle Registration Form
 document.getElementById('regForm').addEventListener('submit', e => {
   e.preventDefault();
   const fullName = document.getElementById('fullName').value.trim();
   const phone = document.getElementById('phone').value.trim();
-  const role = document.getElementById('role').value;
+  let role = roleSelect.value;
+  const otherRole = otherRoleSelect.value;
   const gender = document.getElementById('gender').value;
 
   if (!fullName || !phone || !role || !gender) {
     showAlert('Please fill all fields', 'danger');
     return;
+  }
+
+  if (role === 'Other') {
+    if (!otherRole) {
+      showAlert('Please specify role type.', 'danger');
+      return;
+    }
+    role = otherRole; 
   }
 
   if (members.some(m => m.phone === phone)) {
@@ -181,6 +240,19 @@ document.getElementById('regForm').addEventListener('submit', e => {
   localStorage.setItem(LS_KEYS.members, JSON.stringify(members));
   showAlert('Member registered successfully!');
   document.getElementById('regForm').reset();
+  otherRoleContainer.classList.add('d-none');
+});
+
+// Back to Top
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 200) {
+    backToTop.style.display = 'block';
+  } else {
+    backToTop.style.display = 'none';
+  }
+});
+backToTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 </script>
 </body>
