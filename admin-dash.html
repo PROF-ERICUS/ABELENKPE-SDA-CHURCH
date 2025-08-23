@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Admin Dashboard - ABELENKPE SDA CHURCH</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; background: #f8f9fa; }
@@ -14,38 +14,38 @@
   header h3 { margin: 0; font-size: 1.5rem; transition: all 0.3s ease; }
   header.shrink h3 { font-size: 1.2rem; }
   nav a { margin: 0 0.5rem; }
-  main { flex: 1 0 auto; padding: 120px 15px 20px; max-width: 1000px; margin: auto; }
+  main { flex: 1 0 auto; padding: 120px 15px 20px; max-width: 1100px; margin: auto; }
   .card { margin-bottom: 20px; }
   footer { flex-shrink: 0; background-color: #343a40; color: white; padding: 1rem; text-align: center; }
   #backToTop { position: fixed; bottom: 40px; right: 20px; display: none; z-index: 999; border-radius: 50%; width: 45px; height: 45px; font-size: 24px; line-height: 1; padding: 0; }
-  @media(max-width: 576px){ nav { width: 100%; text-align: center; margin-top: 0.5rem; } nav a { display: inline-block; margin: 0.25rem 0.25rem; } }
 
   /* ------------------- Dashboard Styles ------------------- */
-  .dashboard-card {
-    color: white;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    transition: transform 0.3s, box-shadow 0.3s;
-    padding: 30px 15px;
-  }
-  .dashboard-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.3);
-  }
-  .dashboard-card.total-members {
-    background: linear-gradient(135deg, #ff416c, #ff4b2b);
-  }
-  .dashboard-card.members-present {
-    background: linear-gradient(135deg, #00c6ff, #0072ff);
-  }
-  .dashboard-icon {
-    font-size: 2.5rem;
-    opacity: 0.8;
-  }
+  .dashboard-card { color: white; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); transition: transform 0.3s, box-shadow 0.3s; padding: 30px 15px; }
+  .dashboard-card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.3); }
+  .dashboard-card.total-members { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+  .dashboard-card.members-present { background: linear-gradient(135deg, #00c6ff, #0072ff); }
+  .dashboard-icon { font-size: 2.5rem; opacity: 0.8; }
+
+  /* ------------------- Role Badges ------------------- */
+  .role-badge { font-size: 0.85rem; padding: 5px 10px; border-radius: 12px; color: #fff; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+  .role-class-1 { background: #ff6b6b; }
+  .role-class-2 { background: #6c5ce7; }
+  .role-class-3 { background: #00b894; }
+  .role-class-4 { background: #0984e3; }
+  .role-class-5 { background: #e17055; }
+  .role-class-6 { background: #fd79a8; }
+  .role-class-7 { background: #00cec9; }
+  .role-class-8 { background: #fab005; }
+  .role-class-9 { background: #636e72; }
+  .role-class-10 { background: #1dd1a1; }
+  .role-class-11 { background: #e84393; }
+  .role-class-12 { background: #2d3436; }
+  .role-other { background: #6c757d; }
+
+  .present-pill { font-size: .8rem; }
 </style>
 </head>
 <body>
-
 <header>
   <h3>Admin Dashboard</h3>
   <nav>
@@ -60,7 +60,7 @@
   <h2 class="text-center mb-4">📋 Admin Dashboard</h2>
 
   <!-- Members Dashboard -->
-  <div class="row mb-4">
+  <div class="row mb-4 g-3">
     <div class="col-md-6">
       <div class="card dashboard-card total-members">
         <div class="card-body text-center">
@@ -76,6 +76,7 @@
           <i class="bi bi-person-check-fill dashboard-icon"></i>
           <h5 class="card-title mt-2">Members Present</h5>
           <p id="membersPresent" class="display-4 fw-bold">0</p>
+          <div id="sessionStatusPill" class="mt-2"></div>
         </div>
       </div>
     </div>
@@ -83,10 +84,15 @@
 
   <!-- Registration Control -->
   <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">Registration Control</h5>
-      <p>Status: <span id="regStatus" class="badge bg-success">Open</span></p>
-      <button id="toggleRegBtn" class="btn btn-warning">Close Registration</button>
+    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div>
+        <h5 class="card-title mb-1">Registration Control</h5>
+        <p class="mb-0">Status: <span id="regStatus" class="badge bg-success">Open</span></p>
+      </div>
+      <div class="d-flex gap-2">
+        <button id="toggleRegBtn" class="btn btn-warning">Close Registration</button>
+        <button id="exportMembersBtn" class="btn btn-outline-secondary"><i class="bi bi-download"></i> Export Members</button>
+      </div>
     </div>
   </div>
 
@@ -94,16 +100,21 @@
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Attendance Session</h5>
-      <div class="mb-3">
-        <label>Date</label>
-        <input type="date" id="sessionDate" class="form-control">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Date</label>
+          <input type="date" id="sessionDate" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Time</label>
+          <input type="time" id="sessionTime" class="form-control">
+        </div>
       </div>
-      <div class="mb-3">
-        <label>Time</label>
-        <input type="time" id="sessionTime" class="form-control">
+      <div class="d-grid d-md-flex gap-2 mt-3">
+        <button id="startSessionBtn" class="btn btn-primary">Start Session</button>
+        <button id="closeSessionBtn" class="btn btn-danger">Close Session</button>
+        <button id="exportAttendanceBtn" class="btn btn-outline-secondary"><i class="bi bi-download"></i> Export Attendance</button>
       </div>
-      <button id="startSessionBtn" class="btn btn-primary w-100">Start Session</button>
-      <button id="closeSessionBtn" class="btn btn-danger w-100 mt-2">Close Session</button>
       <div id="sessionMsg" class="mt-2"></div>
     </div>
   </div>
@@ -111,36 +122,83 @@
   <!-- Member Management -->
   <div class="card">
     <div class="card-body">
-      <h5 class="card-title">Members List</h5>
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+        <h5 class="card-title mb-0">Members List</h5>
+        <div class="d-flex gap-2">
+          <input id="searchInput" type="search" class="form-control" placeholder="Search name, phone, role..." />
+          <select id="roleFilter" class="form-select">
+            <option value="">All Roles</option>
+            <option>Class 1</option>
+            <option>Class 2</option>
+            <option>Class 3</option>
+            <option>Class 4</option>
+            <option>Class 5</option>
+            <option>Class 6</option>
+            <option>Class 7</option>
+            <option>Class 8</option>
+            <option>Class 9</option>
+            <option>Class 10</option>
+            <option>Class 11</option>
+            <option>Class 12</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
       <ul id="memberList" class="list-group mb-3"></ul>
-
-      <!-- Manual Add -->
-      <h6>Add Member Manually</h6>
-      <div class="mb-3">
-        <input type="text" id="memberName" placeholder="Full Name" class="form-control mb-2">
-        <input type="text" id="memberRole" placeholder="Role" class="form-control mb-2">
-        <input type="text" id="memberPhone" placeholder="Phone" class="form-control mb-2">
-        <select id="memberGender" class="form-control mb-2">
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
-        <input type="text" id="memberEmail" placeholder="Email (optional)" class="form-control mb-2">
-        <button id="addMemberBtn" class="btn btn-success w-100">Add Member</button>
-        <div id="addMsg" class="mt-2"></div>
-      </div>
-
-      <!-- Excel Upload -->
-      <h6>Upload Members via Excel</h6>
-      <div class="mb-3">
-        <input type="file" id="excelFile" accept=".xlsx, .xls" class="form-control mb-2">
-        <button id="uploadExcelBtn" class="btn btn-primary w-100">Upload Excel</button>
-        <div id="excelMsg" class="mt-2"></div>
-        <small>Required columns: Full Name, Role, Phone, Gender | Optional: Email</small>
-      </div>
     </div>
   </div>
 </main>
+
+<!-- Edit Member Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Member</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm">
+          <input type="hidden" id="editIndex">
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="editName" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Role</label>
+            <select id="editRole" class="form-control">
+              <option>Class 1</option>
+              <option>Class 2</option>
+              <option>Class 3</option>
+              <option>Class 4</option>
+              <option>Class 5</option>
+              <option>Class 6</option>
+              <option>Class 7</option>
+              <option>Class 8</option>
+              <option>Class 9</option>
+              <option>Class 10</option>
+              <option>Class 11</option>
+              <option>Class 12</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input type="tel" id="editPhone" class="form-control" pattern="[0-9]{10,}" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Gender</label>
+            <select id="editGender" class="form-control">
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 <footer>
   &copy; <span id="year"></span> ABELENKPE SDA CHURCH. All Rights Reserved. | Contact: abelenkpesdachurch@gmail.com
@@ -148,190 +206,304 @@
 
 <button id="backToTop" class="btn btn-primary" title="Back to Top">↑</button>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-const header = document.querySelector("header");
-const backToTop = document.getElementById("backToTop");
-window.addEventListener("scroll", () => {
-  if(window.scrollY > 50) header.classList.add("shrink");
-  else header.classList.remove("shrink");
-  backToTop.style.display = window.scrollY > 200 ? "block" : "none";
-});
-backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+// ===================== Local Storage Keys =====================
+const LS_KEYS = {
+  members: 'members',
+  regOpen: 'registrationOpen',
+  session: 'currentSession', // {date, time, active, presentPhones: []}
+  history: 'attendanceHistory' // array of past sessions
+};
 
-let members = JSON.parse(localStorage.getItem("members")) || [];
-let regOpen = JSON.parse(localStorage.getItem("regOpen")) ?? true;
+// ===================== Elements =====================
+const memberList = document.getElementById('memberList');
+const totalMembersEl = document.getElementById('totalMembers');
+const membersPresentEl = document.getElementById('membersPresent');
+const sessionStatusPill = document.getElementById('sessionStatusPill');
+const regStatusEl = document.getElementById('regStatus');
+const toggleRegBtn = document.getElementById('toggleRegBtn');
+const startSessionBtn = document.getElementById('startSessionBtn');
+const closeSessionBtn = document.getElementById('closeSessionBtn');
+const sessionMsg = document.getElementById('sessionMsg');
+const sessionDateInput = document.getElementById('sessionDate');
+const sessionTimeInput = document.getElementById('sessionTime');
+const backToTopBtn = document.getElementById('backToTop');
+const searchInput = document.getElementById('searchInput');
+const roleFilter = document.getElementById('roleFilter');
+const exportMembersBtn = document.getElementById('exportMembersBtn');
+const exportAttendanceBtn = document.getElementById('exportAttendanceBtn');
 
-const regStatus = document.getElementById("regStatus");
-const toggleRegBtn = document.getElementById("toggleRegBtn");
-const memberList = document.getElementById("memberList");
-const addMsg = document.getElementById("addMsg");
+// ===================== Data =====================
+let members = JSON.parse(localStorage.getItem(LS_KEYS.members)) || [
+  { fullName:'John Doe', role:'Class 1', phone:'0541111111', gender:'Male' },
+  { fullName:'Mary Ann', role:'Class 5', phone:'0542222222', gender:'Female' },
+  { fullName:'Peter Smith', role:'Other', phone:'0543333333', gender:'Male' }
+];
 
-const sessionDateInput = document.getElementById("sessionDate");
-const sessionTimeInput = document.getElementById("sessionTime");
-const startSessionBtn = document.getElementById("startSessionBtn");
-const closeSessionBtn = document.getElementById("closeSessionBtn");
-const sessionMsg = document.getElementById("sessionMsg");
+let currentSession = JSON.parse(localStorage.getItem(LS_KEYS.session)) || { active: false, date: null, time: null, presentPhones: [] };
+let attendanceHistory = JSON.parse(localStorage.getItem(LS_KEYS.history)) || [];
+let registrationOpen = JSON.parse(localStorage.getItem(LS_KEYS.regOpen));
+if (registrationOpen === null) registrationOpen = true; // default open
 
-const excelFileInput = document.getElementById("excelFile");
-const uploadExcelBtn = document.getElementById("uploadExcelBtn");
-const excelMsg = document.getElementById("excelMsg");
+// ===================== Utils =====================
+function saveMembers(){ localStorage.setItem(LS_KEYS.members, JSON.stringify(members)); }
+function saveSession(){ localStorage.setItem(LS_KEYS.session, JSON.stringify(currentSession)); }
+function saveHistory(){ localStorage.setItem(LS_KEYS.history, JSON.stringify(attendanceHistory)); }
+function saveRegOpen(){ localStorage.setItem(LS_KEYS.regOpen, JSON.stringify(registrationOpen)); }
 
-// ------------------- Dashboard Functions -------------------
-function updateMembersDashboard() {
-  const total = members.length;
-  const currentSession = JSON.parse(localStorage.getItem("currentSession")) || { attendanceRecords: [] };
-  const present = currentSession.attendanceRecords?.filter(a => a.status === "Present").length || 0;
-
-  document.getElementById("totalMembers").textContent = total;
-  document.getElementById("membersPresent").textContent = present;
+function getRoleClass(role){
+  const roleKey = String(role || '').toLowerCase().replace(/\s+/g,'-'); // "Class 1" -> "class-1"
+  return `role-${roleKey}`; // e.g. role-class-1
 }
 
-function markPresent(studentId, studentName) {
-  let currentSession = JSON.parse(localStorage.getItem("currentSession")) || { attendanceRecords: [] };
-  if(!currentSession.attendanceRecords.some(a => a.id === studentId)){
-    currentSession.attendanceRecords.push({ id: studentId, status: "Present", name: studentName });
-    localStorage.setItem("currentSession", JSON.stringify(currentSession));
-    updateMembersDashboard();
-  }
+function setNowDefaults(){
+  const now = new Date();
+  sessionDateInput.value = now.toISOString().slice(0,10);
+  sessionTimeInput.value = now.toTimeString().slice(0,5);
 }
 
-// ------------------- Members Functions -------------------
-function renderMembers() {
-  memberList.innerHTML = "";
-  if (!members.length) {
-    memberList.innerHTML = `<li class="list-group-item">No members yet.</li>`;
-    updateMembersDashboard();
+function showMsg(text, type='info'){
+  sessionMsg.innerHTML = `<div class="alert alert-${type} py-2 my-2">${text}</div>`;
+  setTimeout(()=>{ sessionMsg.innerHTML=''; }, 3500);
+}
+
+function updateHeaderOnScroll(){
+  if (window.scrollY > 20) document.querySelector('header').classList.add('shrink');
+  else document.querySelector('header').classList.remove('shrink');
+}
+
+function updateBackToTop(){
+  backToTopBtn.style.display = window.scrollY > 150 ? 'block' : 'none';
+}
+
+function phoneExists(phone, ignoreIndex = -1){
+  const cleaned = String(phone).trim();
+  return members.some((m, i) => i !== ignoreIndex && m.phone === cleaned);
+}
+
+function humanSessionStatus(){
+  if (!currentSession.active) return '<span class="badge bg-secondary">No Active Session</span>';
+  return `<span class="badge bg-light text-dark present-pill"><i class="bi bi-broadcast"></i> Active: ${currentSession.date} ${currentSession.time}</span>`;
+}
+
+// ===================== Rendering =====================
+function renderCounts(){
+  totalMembersEl.textContent = members.length;
+  membersPresentEl.textContent = currentSession.presentPhones.length;
+  sessionStatusPill.innerHTML = humanSessionStatus();
+}
+
+function renderReg(){
+  regStatusEl.textContent = registrationOpen ? 'Open' : 'Closed';
+  regStatusEl.className = `badge ${registrationOpen ? 'bg-success' : 'bg-danger'}`;
+  toggleRegBtn.textContent = registrationOpen ? 'Close Registration' : 'Open Registration';
+}
+
+function filteredMembers(){
+  const q = searchInput.value.trim().toLowerCase();
+  const role = roleFilter.value;
+  return members.filter(m => {
+    const matchQ = !q || [m.fullName, m.phone, m.role].join(' ').toLowerCase().includes(q);
+    const matchRole = !role || m.role === role;
+    return matchQ && matchRole;
+  });
+}
+
+function renderMembers(){
+  memberList.innerHTML = '';
+  const list = filteredMembers();
+  if (!list.length){
+    memberList.innerHTML = `<li class="list-group-item">No members to display.</li>`;
     return;
   }
-  members.forEach((m,index) => {
-    const li = document.createElement("li");
-    li.className = "list-group-item d-flex justify-content-between align-items-center flex-wrap";
+  list.forEach((m, index) => {
+    const li = document.createElement('li');
+    li.className = 'list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2';
+
+    const isPresent = currentSession.presentPhones.includes(m.phone);
+
     li.innerHTML = `
-      ${m.fullName} (${m.role}) - ${m.phone} - ${m.gender} ${m.email ? "- "+m.email : ""} 
+      <span class="d-flex align-items-center gap-2 flex-wrap">
+        <strong>${m.fullName}</strong>
+        <span class="role-badge ${getRoleClass(m.role)}"><i class="bi bi-person-badge-fill"></i> ${m.role}</span>
+        <span class="text-muted"><i class="bi bi-telephone-fill"></i> ${m.phone}</span>
+        <span class="badge ${isPresent ? 'bg-success' : 'bg-secondary'} present-pill">${isPresent ? 'Present' : 'Absent'}</span>
+      </span>
       <div class="d-flex flex-wrap gap-1">
-        <button class="btn btn-sm btn-success">Mark Present</button>
-        <button class="btn btn-sm btn-danger">Delete</button>
-      </div>`;
-    
-    // Delete button
-    li.querySelectorAll("button")[1].onclick = () => {
-      if(confirm(`Delete ${m.fullName}?`)){
-        members.splice(index,1);
-        localStorage.setItem("members", JSON.stringify(members));
-        renderMembers();
-        updateMembersDashboard();
-      }
-    };
-
-    // Mark Present button
-    li.querySelectorAll("button")[0].onclick = () => {
-      markPresent(m.id, m.fullName);
-    };
-
+        <button class="btn btn-sm ${isPresent ? 'btn-outline-success' : 'btn-success'} present-btn" data-phone="${m.phone}">
+          <i class="bi bi-check2-square"></i> ${isPresent ? 'Mark Absent' : 'Mark Present'}
+        </button>
+        <button class="btn btn-sm btn-warning edit-btn" data-index="${members.indexOf(m)}"><i class="bi bi-pencil-square"></i> Edit</button>
+        <button class="btn btn-sm btn-danger delete-btn" data-phone="${m.phone}"><i class="bi bi-trash"></i> Delete</button>
+      </div>
+    `;
     memberList.appendChild(li);
   });
-  updateMembersDashboard();
+
+  attachRowHandlers();
 }
 
-function renderRegStatus() {
-  regStatus.innerHTML = `<span class="badge ${regOpen ? "bg-success":"bg-danger"}">${regOpen?"Open":"Closed"}</span>`;
-  toggleRegBtn.textContent = regOpen ? "Close Registration" : "Open Registration";
+function attachRowHandlers(){
+  // Edit buttons
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const idx = Number(this.getAttribute('data-index'));
+      const member = members[idx];
+      document.getElementById('editIndex').value = idx;
+      document.getElementById('editName').value = member.fullName;
+      document.getElementById('editRole').value = member.role;
+      document.getElementById('editPhone').value = member.phone;
+      document.getElementById('editGender').value = member.gender;
+      new bootstrap.Modal(document.getElementById('editModal')).show();
+    });
+  });
+
+  // Delete buttons
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const phone = this.getAttribute('data-phone');
+      const m = members.find(x => x.phone === phone);
+      if (!m) return;
+      if (confirm(`Delete ${m.fullName}? This cannot be undone.`)){
+        members = members.filter(x => x.phone !== phone);
+        // Also remove from present list
+        currentSession.presentPhones = currentSession.presentPhones.filter(p => p !== phone);
+        saveMembers(); saveSession();
+        renderCounts(); renderMembers();
+      }
+    });
+  });
+
+  // Present buttons
+  document.querySelectorAll('.present-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      if (!currentSession.active){
+        showMsg('Start a session before marking attendance.', 'warning');
+        return;
+      }
+      const phone = this.getAttribute('data-phone');
+      const idx = currentSession.presentPhones.indexOf(phone);
+      if (idx === -1) currentSession.presentPhones.push(phone); else currentSession.presentPhones.splice(idx,1);
+      saveSession();
+      renderCounts(); renderMembers();
+    });
+  });
 }
 
-toggleRegBtn.onclick = () => {
-  regOpen = !regOpen;
-  localStorage.setItem("regOpen", JSON.stringify(regOpen));
-  renderRegStatus();
-};
+// ===================== Events =====================
 
-document.getElementById("addMemberBtn").onclick = () => {
-  if(!regOpen) return alert("Registration is closed.");
-  const name = document.getElementById("memberName").value.trim();
-  const role = document.getElementById("memberRole").value.trim();
-  const phone = document.getElementById("memberPhone").value.trim();
-  const gender = document.getElementById("memberGender").value;
-  const email = document.getElementById("memberEmail").value.trim() || "";
+document.getElementById('editForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const idx = Number(document.getElementById('editIndex').value);
+  const newName = document.getElementById('editName').value.trim();
+  const newRole = document.getElementById('editRole').value;
+  const newPhone = document.getElementById('editPhone').value.trim();
+  const newGender = document.getElementById('editGender').value;
 
-  if(!name || !role || !phone || !gender) return alert("Full Name, Role, Phone, and Gender are required.");
-  if(!/^\d+$/.test(phone)) return alert("Phone must contain digits only.");
-  if(members.some(m=>m.phone===phone)){
-    addMsg.innerHTML = `<div class="alert alert-danger">⚠️ Phone number already exists.</div>`;
-    setTimeout(()=>addMsg.innerHTML="",4000);
+  if (phoneExists(newPhone, idx)){
+    alert('Phone already exists for another member.');
     return;
   }
 
-  members.push({id:Date.now().toString(), fullName:name, role, phone, gender, email});
-  localStorage.setItem("members", JSON.stringify(members));
-  document.getElementById("memberName").value="";
-  document.getElementById("memberRole").value="";
-  document.getElementById("memberPhone").value="";
-  document.getElementById("memberGender").value="";
-  document.getElementById("memberEmail").value="";
-  addMsg.innerHTML = `<div class="alert alert-success">✅ Member added successfully.</div>`;
-  setTimeout(()=>addMsg.innerHTML="",4000);
+  members[idx] = { fullName: newName, role: newRole, phone: newPhone, gender: newGender };
+
+  // Keep session present list in sync if phone changed
+  currentSession.presentPhones = currentSession.presentPhones.map(p => p === members[idx].phone ? newPhone : p);
+
+  saveMembers(); saveSession();
   renderMembers();
-};
+  bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+});
 
-startSessionBtn.onclick = () => {
-  const date = sessionDateInput.value;
-  const time = sessionTimeInput.value;
-  if(!date||!time) return alert("Set both date and time");
-  const currentSession={sessionOpen:true,sessionDate:date,sessionTime:time,attendanceRecords:[]};
-  localStorage.setItem("currentSession",JSON.stringify(currentSession));
-  localStorage.setItem("sessionOpen",JSON.stringify(true));
-  localStorage.setItem("sessionDate",date);
-  localStorage.setItem("sessionTime",time);
-  sessionMsg.innerHTML="<div class='text-success'>✅ Session started!</div>";
-  updateMembersDashboard();
-};
+// Registration toggle
+ toggleRegBtn.addEventListener('click', () => {
+  registrationOpen = !registrationOpen;
+  saveRegOpen();
+  renderReg();
+  showMsg(`Registration is now ${registrationOpen ? 'OPEN' : 'CLOSED'}.`, registrationOpen ? 'success' : 'danger');
+});
 
-closeSessionBtn.onclick = () => {
-  let currentSession = JSON.parse(localStorage.getItem("currentSession")) || {};
-  currentSession.sessionOpen=false;
-  localStorage.setItem("currentSession",JSON.stringify(currentSession));
-  localStorage.setItem("sessionOpen",JSON.stringify(false));
-  sessionMsg.innerHTML="<div class='text-warning'>⚠️ Session closed.</div>";
-  updateMembersDashboard();
-};
+// Start session
+startSessionBtn.addEventListener('click', () => {
+  const date = sessionDateInput.value || new Date().toISOString().slice(0,10);
+  const time = sessionTimeInput.value || new Date().toTimeString().slice(0,5);
+  currentSession = { active: true, date, time, presentPhones: [] };
+  saveSession();
+  renderCounts(); renderMembers();
+  showMsg(`Session started for ${date} ${time}.`, 'success');
+});
 
-uploadExcelBtn.onclick = () => {
-  const file = excelFileInput.files[0];
-  if(!file) return alert("Select an Excel file first.");
-  const reader = new FileReader();
-  reader.onload = (e)=>{
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data,{type:"array"});
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const rows = XLSX.utils.sheet_to_json(sheet);
+// Close session
+closeSessionBtn.addEventListener('click', () => {
+  if (!currentSession.active){ showMsg('No active session to close.', 'warning'); return; }
+  // Save to history
+  attendanceHistory.push({ ...currentSession, closedAt: new Date().toISOString() });
+  saveHistory();
+  currentSession = { active: false, date: null, time: null, presentPhones: [] };
+  saveSession();
+  renderCounts(); renderMembers();
+  showMsg('Session closed and saved to history.', 'info');
+});
 
-    let addedCount=0;
-    let skippedCount=0;
-    rows.forEach(row=>{
-      const name = row["Full Name"]?.toString().trim();
-      const role = row["Role"]?.toString().trim();
-      const phone = row["Phone"]?.toString().trim();
-      const email = row["Email"]?.toString().trim() || "";
-      const gender = row["Gender"]?.toString().trim();
+// Search & Filter
+searchInput.addEventListener('input', renderMembers);
+roleFilter.addEventListener('change', renderMembers);
 
-      if(name && role && phone && gender && !members.some(m=>m.phone===phone)){
-        members.push({id:Date.now().toString()+Math.random(), fullName:name, role, phone, email, gender});
-        addedCount++;
-      } else skippedCount++;
-    });
-    localStorage.setItem("members",JSON.stringify(members));
-    renderMembers();
-    excelMsg.innerHTML=`<div class="alert alert-success">✅ ${addedCount} members added. ${skippedCount>0?skippedCount+" rows skipped (missing required info or duplicate).":""}</div>`;
-    setTimeout(()=>excelMsg.innerHTML="",5000);
-  };
-  reader.readAsArrayBuffer(file);
-};
+// Scroll UX
+window.addEventListener('scroll', () => { updateHeaderOnScroll(); updateBackToTop(); });
+backToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-renderMembers();
-renderRegStatus();
-updateMembersDashboard();
-document.getElementById("year").textContent = new Date().getFullYear();
+// Export helpers
+function exportToXLSX(filename, rows){
+  try{
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    XLSX.writeFile(wb, filename);
+  }catch(err){
+    console.error(err);
+    alert('Export failed.');
+  }
+}
+
+exportMembersBtn.addEventListener('click', () => {
+  exportToXLSX('members.xlsx', members);
+});
+
+exportAttendanceBtn.addEventListener('click', () => {
+  const rows = currentSession.active ?
+    members.map(m => ({
+      FullName: m.fullName,
+      Role: m.role,
+      Phone: m.phone,
+      Gender: m.gender,
+      Present: currentSession.presentPhones.includes(m.phone) ? 'Yes' : 'No',
+      SessionDate: currentSession.date,
+      SessionTime: currentSession.time
+    })) :
+    attendanceHistory.flatMap(s => members.map(m => ({
+      FullName: m.fullName,
+      Role: m.role,
+      Phone: m.phone,
+      Gender: m.gender,
+      Present: s.presentPhones.includes(m.phone) ? 'Yes' : 'No',
+      SessionDate: s.date,
+      SessionTime: s.time
+    })));
+  exportToXLSX('attendance.xlsx', rows);
+});
+
+// ===================== Init =====================
+(function init(){
+  document.getElementById('year').textContent = new Date().getFullYear();
+  setNowDefaults();
+  renderReg();
+  renderCounts();
+  renderMembers();
+  updateHeaderOnScroll();
+  updateBackToTop();
+})();
 </script>
-
 </body>
 </html>
