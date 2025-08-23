@@ -8,9 +8,16 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
- body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; background: #f8f9fa; }
-  header { background-color:#f71717; color: white; padding: 1rem; position: fixed; top: 0; width: 100%; z-index: 1000; display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; transition: all 0.3s ease; }
-  header.shrink { padding: 0.5rem 1rem; }
+  body { 
+    display: flex; flex-direction: column; min-height: 100vh; margin: 0; background: #f8f9fa; 
+  }
+  header { 
+    background-color:#f71717; color: white; padding: 1rem; 
+    position: fixed; top: 0; width: 100%; z-index: 1000;
+    display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; 
+    transition: all 0.3s ease; 
+  }
+
   header h3 { margin: 0; font-size: 1.5rem; transition: all 0.3s ease; }
   header.shrink h3 { font-size: 1.2rem; }
   nav a { margin: 0 0.5rem; }
@@ -507,3 +514,4 @@ nextMonth.addEventListener('click', () => { calMonth++; if (calMonth>11){ calMon
 </script>
 </body>
 </html>
+
