@@ -1,120 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Register – ABELENKPE SDA CHURCH</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
-<style>
-  body {
-    display:flex; 
-    flex-direction:column; 
-    min-height:100vh; 
-    background: url('https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1400&q=80') no-repeat center center fixed; 
-    background-size: cover;
-    font-family: 'Segoe UI', sans-serif;
-  }
- header {
-    background-color: rgba(247, 23, 23, 0.9);
-    color: white;
-    padding: 1rem;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    transition: all 0.3s ease;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register – ABELENKPE SDA CHURCH</title>
 
-  header.shrink {
-    padding: 0.5rem 1rem;
-  }
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-  header img {
-    height: 50px;
-    margin-right: 0.5rem;
-    transition: all 0.3s ease;
-  }
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: url('https://images.unsplash.com/photo-1533006411749-6d38e7ab6a2b?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', sans-serif;
+      scroll-behavior: smooth;
+    }
 
-  header.shrink img {
-    height: 35px;
-  }
+    header {
+      background-color: rgba(0, 123, 255, 0.9);
+      color: white;
+      padding: 1rem;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      transition: all 0.3s ease;
+    }
 
-  header h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    text-align: center;
-    transition: all 0.3s ease;
-  }
+    header img {
+      height: 50px;
+      transition: all 0.3s ease;
+    }
 
-  header.shrink h3 {
-    font-size: 1.2rem;
-  }
+    header h3 {
+      margin: 0;
+      font-size: 1.4rem;
+      text-align: center;
+    }
 
-  main {
-    flex: 1 0 auto;
-    padding-top: 140px;
-    max-width: 900px;
-    margin: auto;
-    backdrop-filter: blur(6px);
-  }
+    main {
+      flex: 1 0 auto;
+      padding-top: 130px;
+      max-width: 600px;
+      margin: auto;
+      width: 100%;
+    }
 
-  footer {
-    flex-shrink: 0;
-    background-color: rgba(52, 58, 64, 0.9);
-    color: white;
-    padding: 1rem;
-    text-align: center;
-  }
-  .card { 
-    background: rgba(255,255,255,0.95); 
-    border-radius:15px; 
-    padding:20px; 
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-  }
- 
-  }
-</style>
+    footer {
+      flex-shrink: 0;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    .fade-alert {
+      animation: fadeAlert 4s ease-in-out forwards;
+    }
+
+    @keyframes fadeAlert {
+      0% {opacity: 0;}
+      10%, 90% {opacity: 1;}
+      100% {opacity: 0;}
+    }
+
+    #backToTop {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      z-index: 999;
+    }
+
+    #backToTop:hover {
+      background: #0056b3;
+    }
+  </style>
 </head>
 <body>
 
 <header>
   <div class="d-flex align-items-center">
     <img src="images/sda logo.png" alt="Church Logo">
-    <h3>ABELENKPE SDA CHURCH</h3>
+    <h3 class="ms-2">ABELENKPE SDA CHURCH</h3>
   </div>
   <nav>
-    <a href="index.html" class="btn btn-light btn-sm">Home</a>
-    <a href="login.html" class="btn btn-light btn-sm">Login</a>
-    
-  
+    <a href="index.html" class="btn btn-light btn-sm"><i class="fa fa-home"></i> Home</a>
+    <a href="login.html" class="btn btn-light btn-sm"><i class="fa fa-sign-in-alt"></i> Login</a>
   </nav>
 </header>
 
 <main>
   <div id="alertBox" class="alert alert-success text-center d-none fade-alert"></div>
-
   <div id="registrationClosed" class="alert alert-danger text-center d-none">
-    <i class="bi bi-lock-fill"></i> Registration is currently closed.
+    <i class="fa fa-lock"></i> Registration is currently closed.
   </div>
 
   <div id="registrationCard" class="card">
-    <h4 class="mb-3 text-center">Member Registration</h4>
+    <h4 class="mb-3 text-center"><i class="fa fa-user-plus"></i> Member Registration</h4>
     <form id="regForm">
       <div class="mb-3">
-        <label class="form-label">Full Name</label>
+        <label class="form-label"><i class="fa fa-user"></i> Full Name</label>
         <input type="text" class="form-control" id="fullName" placeholder="Enter your full name" required />
       </div>
       <div class="mb-3">
-        <label class="form-label">Phone</label>
+        <label class="form-label"><i class="fa fa-phone"></i> Phone</label>
         <input type="tel" class="form-control" id="phone" placeholder="e.g. 0541234567" required />
       </div>
       <div class="mb-3">
-        <label class="form-label">Role/Class</label>
+        <label class="form-label"><i class="fa fa-users"></i> Role/Class</label>
         <select id="role" class="form-select" required>
           <option value="">Choose...</option>
           <option>Class 1</option><option>Class 2</option><option>Class 3</option>
@@ -124,27 +150,23 @@
           <option>Other</option>
         </select>
       </div>
-
-      <!-- Hidden field for specifying visitor/adventist -->
       <div class="mb-3 d-none" id="otherRoleContainer">
-        <label class="form-label">Specify</label>
+        <label class="form-label"><i class="fa fa-question-circle"></i> Specify</label>
         <select id="otherRole" class="form-select">
           <option value="">Choose...</option>
-        
           <option>Adventist</option>
           <option>Non-Adventist</option>
         </select>
       </div>
-
       <div class="mb-3">
-        <label class="form-label">Gender</label>
+        <label class="form-label"><i class="fa fa-venus-mars"></i> Gender</label>
         <select id="gender" class="form-select" required>
           <option value="">Choose...</option>
           <option>Male</option>
           <option>Female</option>
         </select>
       </div>
-      <button type="submit" class="btn btn-success w-100"><i class="bi bi-person-plus"></i> Register</button>
+      <button type="submit" class="btn btn-success w-100"><i class="fa fa-save"></i> Register</button>
     </form>
   </div>
 </main>
@@ -153,79 +175,72 @@
   &copy; <span id="year"></span> ABELENKPE SDA CHURCH. All Rights Reserved.
 </footer>
 
+<!-- Back to Top -->
+<button id="backToTop"><i class="fa fa-arrow-up"></i></button>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-const LS_KEYS = { members: 'members', registration: 'registrationOpen' };
-let members = JSON.parse(localStorage.getItem(LS_KEYS.members)) || [];
-let registrationOpen = JSON.parse(localStorage.getItem(LS_KEYS.registration));
-if (registrationOpen === null) registrationOpen = true;
+  const LS_KEYS = { members: 'members', registration: 'registrationOpen' };
+  let members = JSON.parse(localStorage.getItem(LS_KEYS.members)) || [];
+  let registrationOpen = JSON.parse(localStorage.getItem(LS_KEYS.registration));
+  if (registrationOpen === null) registrationOpen = true;
 
-const registrationCard = document.getElementById('registrationCard');
-const registrationClosed = document.getElementById('registrationClosed');
-const alertBox = document.getElementById('alertBox');
-const yearEl = document.getElementById('year');
-const roleSelect = document.getElementById('role');
-const otherRoleContainer = document.getElementById('otherRoleContainer');
-const otherRoleSelect = document.getElementById('otherRole');
-yearEl.textContent = new Date().getFullYear();
+  const registrationCard = document.getElementById('registrationCard');
+  const registrationClosed = document.getElementById('registrationClosed');
+  const alertBox = document.getElementById('alertBox');
+  const yearEl = document.getElementById('year');
+  const roleSelect = document.getElementById('role');
+  const otherRoleContainer = document.getElementById('otherRoleContainer');
+  const otherRoleSelect = document.getElementById('otherRole');
+  const backToTop = document.getElementById('backToTop');
+  yearEl.textContent = new Date().getFullYear();
 
-// Show/hide registration
-if (!registrationOpen) {
-  registrationCard.classList.add('d-none');
-  registrationClosed.classList.remove('d-none');
-}
+  // Show/hide registration
+  if (!registrationOpen) {
+    registrationCard.classList.add('d-none');
+    registrationClosed.classList.remove('d-none');
+  }
 
-roleSelect.addEventListener('change', () => {
-  if (roleSelect.value === 'Other') {
-    otherRoleContainer.classList.remove('d-none');
-  } else {
+  // Show otherRole field
+  roleSelect.addEventListener('change', () => {
+    otherRoleContainer.classList.toggle('d-none', roleSelect.value !== 'Other');
+    if (roleSelect.value !== 'Other') otherRoleSelect.value = '';
+  });
+
+  // Alert
+  function showAlert(msg, type='success'){
+    alertBox.className = `alert alert-${type} text-center fade-alert`;
+    alertBox.textContent = msg;
+    alertBox.classList.remove('d-none');
+    setTimeout(()=> alertBox.classList.add('d-none'), 4000);
+  }
+
+  // Form submit
+  document.getElementById('regForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const fullName = document.getElementById('fullName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    let role = roleSelect.value;
+    const otherRole = otherRoleSelect.value;
+    const gender = document.getElementById('gender').value;
+
+    if (!fullName || !phone || !role || !gender) return showAlert('Please fill all fields', 'danger');
+    if (role === 'Other' && !otherRole) return showAlert('Please specify role type.', 'danger');
+    if (role === 'Other') role = otherRole;
+    if (members.some(m => m.phone === phone)) return showAlert('Member with this phone already exists.', 'danger');
+
+    members.push({ fullName, phone, role, gender });
+    localStorage.setItem(LS_KEYS.members, JSON.stringify(members));
+    showAlert('Member registered successfully!');
+    e.target.reset();
     otherRoleContainer.classList.add('d-none');
-    otherRoleSelect.value = '';
-  }
-});
+  });
 
-function showAlert(msg, type='success'){
-  alertBox.className = `alert alert-${type} text-center fade-alert`;
-  alertBox.textContent = msg;
-  alertBox.classList.remove('d-none');
-  setTimeout(()=> alertBox.classList.add('hide'), 3000);
-  setTimeout(()=> alertBox.classList.add('d-none'), 4000);
-}
-
-document.getElementById('regForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const fullName = document.getElementById('fullName').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  let role = roleSelect.value;
-  const otherRole = otherRoleSelect.value;
-  const gender = document.getElementById('gender').value;
-
-  if (!fullName || !phone || !role || !gender) {
-    showAlert('Please fill all fields', 'danger');
-    return;
-  }
-
-  if (role === 'Other') {
-    if (!otherRole) {
-      showAlert('Please specify role type.', 'danger');
-      return;
-    }
-    role = otherRole; 
-  }
-
-  if (members.some(m => m.phone === phone)) {
-    showAlert('Member with this phone already exists.', 'danger');
-    return;
-  }
-
-  members.push({ fullName, phone, role, gender });
-  localStorage.setItem(LS_KEYS.members, JSON.stringify(members));
-  showAlert('Member registered successfully!');
-  document.getElementById('regForm').reset();
-  otherRoleContainer.classList.add('d-none');
-});
+  // Back to top
+  window.addEventListener('scroll', () => {
+    backToTop.style.display = window.scrollY > 200 ? 'flex' : 'none';
+  });
+  backToTop.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
 </script>
 </body>
 </html>
-
-
