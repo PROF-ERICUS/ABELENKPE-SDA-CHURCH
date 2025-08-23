@@ -19,24 +19,10 @@
     background-size: cover;
     font-family: 'Segoe UI', sans-serif;
   }
- header {
-    background-color: rgba(247, 23, 23, 0.9);
-    color: white;
-    padding: 1rem;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    transition: all 0.3s ease;
-  }
-
-  header.shrink {
-    padding: 0.5rem 1rem;
-  }
+  header { background-color:#f71717; color: white; padding: 1rem; position: fixed; top: 0; width: 100%; z-index: 1000; display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; transition: all 0.3s ease; }
+  header.shrink { padding: 0.5rem 1rem; }
+  header h3 { margin: 0; font-size: 1.5rem; transition: all 0.3s ease; }
+  header.shrink h3 { font-size: 1.2rem; }
 
   header img { height: 50px; margin-right: 10px; }
   header h3 { margin: 0; font-weight: 700; font-size: 1.4rem; }
@@ -254,4 +240,5 @@ backToTop.addEventListener('click', () => {
 </script>
 </body>
 </html>
+
 
