@@ -19,14 +19,14 @@
   footer { flex-shrink: 0; background-color: #343a40; color: white; padding: 1rem; text-align: center; }
   #backToTop { position: fixed; bottom: 40px; right: 20px; display: none; z-index: 999; border-radius: 50%; width: 45px; height: 45px; font-size: 24px; line-height: 1; padding: 0; }
 
-  /* ------------------- Dashboard Styles ------------------- */
+  /* Dashboard */
   .dashboard-card { color: white; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); transition: transform 0.3s, box-shadow 0.3s; padding: 30px 15px; }
   .dashboard-card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.3); }
   .dashboard-card.total-members { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
   .dashboard-card.members-present { background: linear-gradient(135deg, #00c6ff, #0072ff); }
   .dashboard-icon { font-size: 2.5rem; opacity: 0.8; }
 
-  /* ------------------- Role Badges ------------------- */
+  /* Role Badges */
   .role-badge { font-size: 0.85rem; padding: 5px 10px; border-radius: 12px; color: #fff; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
   .role-class-1 { background: #ff6b6b; }
   .role-class-2 { background: #6c5ce7; }
@@ -144,10 +144,65 @@
           </select>
         </div>
       </div>
+
+      <!-- Add & Upload -->
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">
+          <i class="bi bi-person-plus"></i> Add Member
+        </button>
+        <label class="btn btn-outline-primary mb-0">
+          <i class="bi bi-upload"></i> Upload Excel
+          <input type="file" id="uploadExcel" accept=".xlsx,.xls" hidden>
+        </label>
+        <button id="downloadTemplateBtn" class="btn btn-outline-secondary">
+          <i class="bi bi-file-earmark-spreadsheet"></i> Download Template
+        </button>
+      </div>
+
       <ul id="memberList" class="list-group mb-3"></ul>
     </div>
   </div>
 </main>
+
+<!-- Add Member Modal -->
+<div class="modal fade" id="addModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Member</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addForm">
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="addName" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Role</label>
+            <select id="addRole" class="form-control">
+              <option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option>
+              <option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option>
+              <option>Class 9</option><option>Class 10</option><option>Class 11</option><option>Class 12</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input type="tel" id="addPhone" class="form-control" pattern="[0-9]{10,}" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Gender</label>
+            <select id="addGender" class="form-control">
+              <option>Male</option><option>Female</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Add Member</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Edit Member Modal -->
 <div class="modal fade" id="editModal" tabindex="-1">
@@ -167,18 +222,9 @@
           <div class="mb-3">
             <label class="form-label">Role</label>
             <select id="editRole" class="form-control">
-              <option>Class 1</option>
-              <option>Class 2</option>
-              <option>Class 3</option>
-              <option>Class 4</option>
-              <option>Class 5</option>
-              <option>Class 6</option>
-              <option>Class 7</option>
-              <option>Class 8</option>
-              <option>Class 9</option>
-              <option>Class 10</option>
-              <option>Class 11</option>
-              <option>Class 12</option>
+              <option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option>
+              <option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option>
+              <option>Class 9</option><option>Class 10</option><option>Class 11</option><option>Class 12</option>
               <option>Other</option>
             </select>
           </div>
@@ -189,8 +235,7 @@
           <div class="mb-3">
             <label class="form-label">Gender</label>
             <select id="editGender" class="form-control">
-              <option>Male</option>
-              <option>Female</option>
+              <option>Male</option><option>Female</option>
             </select>
           </div>
           <button type="submit" class="btn btn-primary w-100">Save Changes</button>
@@ -233,6 +278,8 @@ const searchInput = document.getElementById('searchInput');
 const roleFilter = document.getElementById('roleFilter');
 const exportMembersBtn = document.getElementById('exportMembersBtn');
 const exportAttendanceBtn = document.getElementById('exportAttendanceBtn');
+const uploadExcelInput = document.getElementById('uploadExcel');
+const downloadTemplateBtn = document.getElementById('downloadTemplateBtn');
 
 // ===================== Data =====================
 let members = JSON.parse(localStorage.getItem(LS_KEYS.members)) || [
@@ -317,7 +364,7 @@ function renderMembers(){
     memberList.innerHTML = `<li class="list-group-item">No members to display.</li>`;
     return;
   }
-  list.forEach((m, index) => {
+  list.forEach((m) => {
     const li = document.createElement('li');
     li.className = 'list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2';
 
@@ -393,6 +440,27 @@ function attachRowHandlers(){
 
 // ===================== Events =====================
 
+// Add member form
+document.getElementById('addForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const name = document.getElementById('addName').value.trim();
+  const role = document.getElementById('addRole').value;
+  const phone = document.getElementById('addPhone').value.trim();
+  const gender = document.getElementById('addGender').value;
+
+  if (!name || !phone){ alert('Name and Phone are required.'); return; }
+  if (phoneExists(phone)){ alert('Phone already exists for another member.'); return; }
+
+  members.push({ fullName: name, role, phone, gender });
+  saveMembers();
+  renderCounts();
+  renderMembers();
+
+  this.reset();
+  bootstrap.Modal.getInstance(document.getElementById('addModal')).hide();
+});
+
+// Edit member form (bug-fixed sync)
 document.getElementById('editForm').addEventListener('submit', function(e){
   e.preventDefault();
   const idx = Number(document.getElementById('editIndex').value);
@@ -401,6 +469,7 @@ document.getElementById('editForm').addEventListener('submit', function(e){
   const newPhone = document.getElementById('editPhone').value.trim();
   const newGender = document.getElementById('editGender').value;
 
+  const oldPhone = members[idx].phone;
   if (phoneExists(newPhone, idx)){
     alert('Phone already exists for another member.');
     return;
@@ -409,7 +478,9 @@ document.getElementById('editForm').addEventListener('submit', function(e){
   members[idx] = { fullName: newName, role: newRole, phone: newPhone, gender: newGender };
 
   // Keep session present list in sync if phone changed
-  currentSession.presentPhones = currentSession.presentPhones.map(p => p === members[idx].phone ? newPhone : p);
+  if (oldPhone !== newPhone){
+    currentSession.presentPhones = currentSession.presentPhones.map(p => p === oldPhone ? newPhone : p);
+  }
 
   saveMembers(); saveSession();
   renderMembers();
@@ -417,7 +488,7 @@ document.getElementById('editForm').addEventListener('submit', function(e){
 });
 
 // Registration toggle
- toggleRegBtn.addEventListener('click', () => {
+toggleRegBtn.addEventListener('click', () => {
   registrationOpen = !registrationOpen;
   saveRegOpen();
   renderReg();
@@ -437,7 +508,6 @@ startSessionBtn.addEventListener('click', () => {
 // Close session
 closeSessionBtn.addEventListener('click', () => {
   if (!currentSession.active){ showMsg('No active session to close.', 'warning'); return; }
-  // Save to history
   attendanceHistory.push({ ...currentSession, closedAt: new Date().toISOString() });
   saveHistory();
   currentSession = { active: false, date: null, time: null, presentPhones: [] };
@@ -492,6 +562,56 @@ exportAttendanceBtn.addEventListener('click', () => {
       SessionTime: s.time
     })));
   exportToXLSX('attendance.xlsx', rows);
+});
+
+// -------- Excel Upload + Template --------
+uploadExcelInput.addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try {
+      const data = new Uint8Array(ev.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws);
+
+      let added = 0, skipped = 0;
+      rows.forEach(r => {
+        // Accept common header variants
+        const name = (r["Full Name"] ?? r["FullName"] ?? r["Name"] ?? "").toString().trim();
+        const role = (r["Role"] ?? "Other").toString().trim() || "Other";
+        const phone = (r["Phone"] ?? "").toString().trim();
+        const gender = (r["Gender"] ?? "Male").toString().trim();
+
+        if (name && phone && !phoneExists(phone)) {
+          members.push({ fullName: name, role, phone, gender });
+          added++;
+        } else {
+          skipped++;
+        }
+      });
+
+      saveMembers();
+      renderCounts();
+      renderMembers();
+      alert(`Upload complete. Added: ${added}${skipped ? ` | Skipped: ${skipped}` : ''}`);
+    } catch(err){
+      console.error(err);
+      alert('Could not read the Excel file. Please check the format.');
+    } finally {
+      e.target.value = ''; // reset file input
+    }
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+downloadTemplateBtn.addEventListener('click', () => {
+  const template = [
+    { "Full Name": "John Doe", "Role": "Class 1", "Phone": "0541111111", "Gender": "Male" },
+    { "Full Name": "Mary Ann", "Role": "Class 5", "Phone": "0542222222", "Gender": "Female" }
+  ];
+  exportToXLSX("members-template.xlsx", template);
 });
 
 // ===================== Init =====================
