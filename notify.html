@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absentees Notification</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+
+  .container {
+    max-width: 950px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    word-break: break-word;
+  }
+
+  th {
+    background: #007BFF;
+    color: #fff;
+  }
+
+  tr:nth-child(odd) { background: #e9f5ff; }
+  tr:nth-child(even) { background: #fff3e6; }
+  tr:hover { background: #d1e7fd; }
+
+  .buttons {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: bold;
+    transition: background 0.3s ease;
+    flex: 1 1 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  #sendSMS { background: #ffc107; color: #333; }
+  #sendSMS:hover { background: #e0a800; }
+
+  #sendWhatsApp { background: #25D366; }
+  #sendWhatsApp:hover { background: #1ebe5d; }
+
+  #downloadPDF { background: #17a2b8; }
+  #downloadPDF:hover { background: #138496; }
+
+  #notification {
+    text-align: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    display: none;
+    transition: opacity 1s ease;
+  }
+  #notification.fade { opacity: 0; }
+
+  @media(max-width: 576px) {
+    table, thead, tbody, th, td, tr {
+      display: block;
+    }
+    th { display: none; }
+    td {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      border: 1px solid #ddd;
+      margin-bottom: 5px;
+    }
+    td::before {
+      content: attr(data-label);
+      font-weight: bold;
+    }
+    .buttons { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>📋 Absentees List</h2>
+
+  <div id="notification"></div>
+
+  <table id="absenteesTable">
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="selectAll"></th>
+        <th>Name</th>
+        <th>Phone</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="buttons">
+    <button id="sendSMS"><i class="fas fa-sms"></i> Send SMS</button>
+    <button id="sendWhatsApp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+    <button id="downloadPDF"><i class="fas fa-file-pdf"></i> Download PDF</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  let members = JSON.parse(localStorage.getItem("members")) || [
+    { fullName: "John Doe", phone: "0540000000" },
+    { fullName: "Mary Ann", phone: "0541111111" },
+    { fullName: "David King", phone: "0542222222" }
+  ];
+
+  let currentSession = JSON.parse(localStorage.getItem("currentSession")) || {
+    attendanceRecords: [ { phone: "0540000000" } ]
+  };
+
+  const tbody = document.querySelector("#absenteesTable tbody");
+  const absentees = members.filter(m => !currentSession.attendanceRecords.some(r => r.phone === m.phone));
+
+  absentees.forEach((m, index) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td data-label="Select"><input type="checkbox" class="absent-check" data-index="${index}" checked></td>
+      <td data-label="Name"><i class="fas fa-user"></i> ${m.fullName}</td>
+      <td data-label="Phone">
+        <a href="tel:${m.phone}" style="color: inherit; text-decoration: none;">
+          <i class="fas fa-phone"></i> ${m.phone}
+        </a>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  function showNotification(message, type="info") {
+    const notification = document.getElementById("notification");
+    notification.textContent = message;
+    notification.className = `alert alert-${type}`;
+    notification.style.display = "block";
+    notification.style.opacity = 1;
+
+    setTimeout(() => {
+      notification.classList.add("fade");
+      setTimeout(() => {
+        notification.style.display = "none";
+        notification.classList.remove("fade");
+      }, 1000);
+    }, 3000);
+  }
+
+  function getSelectedAbsentees() {
+    const checked = document.querySelectorAll(".absent-check:checked");
+    return Array.from(checked).map(cb => absentees[cb.dataset.index]);
+  }
+
+  const selectAllCheckbox = document.getElementById("selectAll");
+  selectAllCheckbox.addEventListener("change", function () {
+    const checkboxes = document.querySelectorAll(".absent-check");
+    checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+  });
+
+  document.addEventListener("change", function(e) {
+    if (e.target.classList.contains("absent-check") && !e.target.checked) {
+      selectAllCheckbox.checked = false;
+    }
+  });
+document.getElementById("sendSMS").addEventListener("click", function () {
+    const list = getSelectedAbsentees();
+    if (!list.length) return showNotification("No absentees selected!", "warning");
+
+    const smsPromises = list.map(a => {
+        // Convert to international format
+        const phone = a.phone.startsWith("0") ? "233" + a.phone.substring(1) : a.phone;
+        const msg = `Hi ${a.fullName}, Top Ministries International missed you at church today 🙏. Hope you're doing well`;
+
+        // Call PHP proxy
+        return fetch("send_sms.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `to=${phone}&msg=${encodeURIComponent(msg)}`
+        })
+        .then(res => res.json())
+        .then(data => ({ name: a.fullName, phone, response: data }))
+        .catch(err => ({ name: a.fullName, phone, error: err }));
+    });
+
+    Promise.all(smsPromises).then(results => {
+        const sent = results.filter(r => r.response && r.response.status === "success").map(r => r.name);
+        const failed = results.filter(r => r.error || (r.response && r.response.status !== "success")).map(r => r.name);
+
+        let msg = "";
+        if (sent.length) msg += `SMS sent to: ${sent.join(", ")}. `;
+        if (failed.length) msg += `Failed: ${failed.join(", ")}.`;
+
+        showNotification(msg || "No SMS sent.", failed.length ? "danger" : "success");
+        console.log("SMS Results:", results);
+    });
+});
+
+
+
+
+  document.getElementById("sendWhatsApp").addEventListener("click", function () {
+    const list = getSelectedAbsentees();
+    if (!list.length) return showNotification("No absentees selected!", "warning");
+    list.forEach(a => {
+      const phone = a.phone.replace(/^0/, "+233");
+      const msg = encodeURIComponent(`Hi ${a.fullName}, Top Ministries International missed you at church today 🙏. Hope you're doing well`);
+      window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
+    });
+    showNotification("WhatsApp messages opened!", "success");
+  });
+
+  document.getElementById("downloadPDF").addEventListener("click", function () {
+    const list = getSelectedAbsentees();
+    if (!list.length) return showNotification("No absentees selected!", "warning");
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text("Absentees List", 14, 22);
+    doc.setFontSize(12);
+
+    const tableColumn = ["Name", "Phone"];
+    const tableRows = list.map(a => [a.fullName, a.phone]);
+
+    // AutoTable
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30
+    });
+
+    doc.save("Absentees_List.pdf");
+  });
+
+});
+</script>
+<!-- jsPDF AutoTable Plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</body>
+</html>

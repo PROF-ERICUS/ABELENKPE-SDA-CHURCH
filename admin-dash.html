@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - ABELENKPE SDA CHURCH</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; background: #f8f9fa; }
+  header { background-color:#f71717; color: white; padding: 1rem; position: fixed; top: 0; width: 100%; z-index: 1000; display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; transition: all 0.3s ease; }
+  header.shrink { padding: 0.5rem 1rem; }
+  header h3 { margin: 0; font-size: 1.5rem; transition: all 0.3s ease; }
+  header.shrink h3 { font-size: 1.2rem; }
+  nav a { margin: 0 0.5rem; }
+  main { flex: 1 0 auto; padding: 120px 15px 20px; max-width: 1000px; margin: auto; }
+  .card { margin-bottom: 20px; }
+  footer { flex-shrink: 0; background-color: #343a40; color: white; padding: 1rem; text-align: center; }
+  #backToTop { position: fixed; bottom: 40px; right: 20px; display: none; z-index: 999; border-radius: 50%; width: 45px; height: 45px; font-size: 24px; line-height: 1; padding: 0; }
+  @media(max-width: 576px){ nav { width: 100%; text-align: center; margin-top: 0.5rem; } nav a { display: inline-block; margin: 0.25rem 0.25rem; } }
+
+  /* ------------------- Dashboard Styles ------------------- */
+  .dashboard-card {
+    color: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+    padding: 30px 15px;
+  }
+  .dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+  }
+  .dashboard-card.total-members {
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  }
+  .dashboard-card.members-present {
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+  }
+  .dashboard-icon {
+    font-size: 2.5rem;
+    opacity: 0.8;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h3>Admin Dashboard</h3>
+  <nav>
+    <a href="index.html" class="btn btn-light btn-sm">Home</a>
+    <a href="registration.html" class="btn btn-light btn-sm">Register</a>
+    <a href="admin-dash.html" class="btn btn-light btn-sm">Admin</a>
+    <a href="session.html" class="btn btn-light btn-sm">Attendance</a>
+  </nav>
+</header>
+
+<main>
+  <h2 class="text-center mb-4">📋 Admin Dashboard</h2>
+
+  <!-- Members Dashboard -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card dashboard-card total-members">
+        <div class="card-body text-center">
+          <i class="bi bi-people-fill dashboard-icon"></i>
+          <h5 class="card-title mt-2">Total Members</h5>
+          <p id="totalMembers" class="display-4 fw-bold">0</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card dashboard-card members-present">
+        <div class="card-body text-center">
+          <i class="bi bi-person-check-fill dashboard-icon"></i>
+          <h5 class="card-title mt-2">Members Present</h5>
+          <p id="membersPresent" class="display-4 fw-bold">0</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Registration Control -->
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Registration Control</h5>
+      <p>Status: <span id="regStatus" class="badge bg-success">Open</span></p>
+      <button id="toggleRegBtn" class="btn btn-warning">Close Registration</button>
+    </div>
+  </div>
+
+  <!-- Session Control -->
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Attendance Session</h5>
+      <div class="mb-3">
+        <label>Date</label>
+        <input type="date" id="sessionDate" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label>Time</label>
+        <input type="time" id="sessionTime" class="form-control">
+      </div>
+      <button id="startSessionBtn" class="btn btn-primary w-100">Start Session</button>
+      <button id="closeSessionBtn" class="btn btn-danger w-100 mt-2">Close Session</button>
+      <div id="sessionMsg" class="mt-2"></div>
+    </div>
+  </div>
+
+  <!-- Member Management -->
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Members List</h5>
+      <ul id="memberList" class="list-group mb-3"></ul>
+
+      <!-- Manual Add -->
+      <h6>Add Member Manually</h6>
+      <div class="mb-3">
+        <input type="text" id="memberName" placeholder="Full Name" class="form-control mb-2">
+        <input type="text" id="memberRole" placeholder="Role" class="form-control mb-2">
+        <input type="text" id="memberPhone" placeholder="Phone" class="form-control mb-2">
+        <select id="memberGender" class="form-control mb-2">
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+        <input type="text" id="memberEmail" placeholder="Email (optional)" class="form-control mb-2">
+        <button id="addMemberBtn" class="btn btn-success w-100">Add Member</button>
+        <div id="addMsg" class="mt-2"></div>
+      </div>
+
+      <!-- Excel Upload -->
+      <h6>Upload Members via Excel</h6>
+      <div class="mb-3">
+        <input type="file" id="excelFile" accept=".xlsx, .xls" class="form-control mb-2">
+        <button id="uploadExcelBtn" class="btn btn-primary w-100">Upload Excel</button>
+        <div id="excelMsg" class="mt-2"></div>
+        <small>Required columns: Full Name, Role, Phone, Gender | Optional: Email</small>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  &copy; <span id="year"></span> ABELENKPE SDA CHURCH. All Rights Reserved. | Contact: abelenkpesdachurch@gmail.com
+</footer>
+
+<button id="backToTop" class="btn btn-primary" title="Back to Top">↑</button>
+
+<script>
+const header = document.querySelector("header");
+const backToTop = document.getElementById("backToTop");
+window.addEventListener("scroll", () => {
+  if(window.scrollY > 50) header.classList.add("shrink");
+  else header.classList.remove("shrink");
+  backToTop.style.display = window.scrollY > 200 ? "block" : "none";
+});
+backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+let members = JSON.parse(localStorage.getItem("members")) || [];
+let regOpen = JSON.parse(localStorage.getItem("regOpen")) ?? true;
+
+const regStatus = document.getElementById("regStatus");
+const toggleRegBtn = document.getElementById("toggleRegBtn");
+const memberList = document.getElementById("memberList");
+const addMsg = document.getElementById("addMsg");
+
+const sessionDateInput = document.getElementById("sessionDate");
+const sessionTimeInput = document.getElementById("sessionTime");
+const startSessionBtn = document.getElementById("startSessionBtn");
+const closeSessionBtn = document.getElementById("closeSessionBtn");
+const sessionMsg = document.getElementById("sessionMsg");
+
+const excelFileInput = document.getElementById("excelFile");
+const uploadExcelBtn = document.getElementById("uploadExcelBtn");
+const excelMsg = document.getElementById("excelMsg");
+
+// ------------------- Dashboard Functions -------------------
+function updateMembersDashboard() {
+  const total = members.length;
+  const currentSession = JSON.parse(localStorage.getItem("currentSession")) || { attendanceRecords: [] };
+  const present = currentSession.attendanceRecords?.filter(a => a.status === "Present").length || 0;
+
+  document.getElementById("totalMembers").textContent = total;
+  document.getElementById("membersPresent").textContent = present;
+}
+
+function markPresent(studentId, studentName) {
+  let currentSession = JSON.parse(localStorage.getItem("currentSession")) || { attendanceRecords: [] };
+  if(!currentSession.attendanceRecords.some(a => a.id === studentId)){
+    currentSession.attendanceRecords.push({ id: studentId, status: "Present", name: studentName });
+    localStorage.setItem("currentSession", JSON.stringify(currentSession));
+    updateMembersDashboard();
+  }
+}
+
+// ------------------- Members Functions -------------------
+function renderMembers() {
+  memberList.innerHTML = "";
+  if (!members.length) {
+    memberList.innerHTML = `<li class="list-group-item">No members yet.</li>`;
+    updateMembersDashboard();
+    return;
+  }
+  members.forEach((m,index) => {
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center flex-wrap";
+    li.innerHTML = `
+      ${m.fullName} (${m.role}) - ${m.phone} - ${m.gender} ${m.email ? "- "+m.email : ""} 
+      <div class="d-flex flex-wrap gap-1">
+        <button class="btn btn-sm btn-success">Mark Present</button>
+        <button class="btn btn-sm btn-danger">Delete</button>
+      </div>`;
+    
+    // Delete button
+    li.querySelectorAll("button")[1].onclick = () => {
+      if(confirm(`Delete ${m.fullName}?`)){
+        members.splice(index,1);
+        localStorage.setItem("members", JSON.stringify(members));
+        renderMembers();
+        updateMembersDashboard();
+      }
+    };
+
+    // Mark Present button
+    li.querySelectorAll("button")[0].onclick = () => {
+      markPresent(m.id, m.fullName);
+    };
+
+    memberList.appendChild(li);
+  });
+  updateMembersDashboard();
+}
+
+function renderRegStatus() {
+  regStatus.innerHTML = `<span class="badge ${regOpen ? "bg-success":"bg-danger"}">${regOpen?"Open":"Closed"}</span>`;
+  toggleRegBtn.textContent = regOpen ? "Close Registration" : "Open Registration";
+}
+
+toggleRegBtn.onclick = () => {
+  regOpen = !regOpen;
+  localStorage.setItem("regOpen", JSON.stringify(regOpen));
+  renderRegStatus();
+};
+
+document.getElementById("addMemberBtn").onclick = () => {
+  if(!regOpen) return alert("Registration is closed.");
+  const name = document.getElementById("memberName").value.trim();
+  const role = document.getElementById("memberRole").value.trim();
+  const phone = document.getElementById("memberPhone").value.trim();
+  const gender = document.getElementById("memberGender").value;
+  const email = document.getElementById("memberEmail").value.trim() || "";
+
+  if(!name || !role || !phone || !gender) return alert("Full Name, Role, Phone, and Gender are required.");
+  if(!/^\d+$/.test(phone)) return alert("Phone must contain digits only.");
+  if(members.some(m=>m.phone===phone)){
+    addMsg.innerHTML = `<div class="alert alert-danger">⚠️ Phone number already exists.</div>`;
+    setTimeout(()=>addMsg.innerHTML="",4000);
+    return;
+  }
+
+  members.push({id:Date.now().toString(), fullName:name, role, phone, gender, email});
+  localStorage.setItem("members", JSON.stringify(members));
+  document.getElementById("memberName").value="";
+  document.getElementById("memberRole").value="";
+  document.getElementById("memberPhone").value="";
+  document.getElementById("memberGender").value="";
+  document.getElementById("memberEmail").value="";
+  addMsg.innerHTML = `<div class="alert alert-success">✅ Member added successfully.</div>`;
+  setTimeout(()=>addMsg.innerHTML="",4000);
+  renderMembers();
+};
+
+startSessionBtn.onclick = () => {
+  const date = sessionDateInput.value;
+  const time = sessionTimeInput.value;
+  if(!date||!time) return alert("Set both date and time");
+  const currentSession={sessionOpen:true,sessionDate:date,sessionTime:time,attendanceRecords:[]};
+  localStorage.setItem("currentSession",JSON.stringify(currentSession));
+  localStorage.setItem("sessionOpen",JSON.stringify(true));
+  localStorage.setItem("sessionDate",date);
+  localStorage.setItem("sessionTime",time);
+  sessionMsg.innerHTML="<div class='text-success'>✅ Session started!</div>";
+  updateMembersDashboard();
+};
+
+closeSessionBtn.onclick = () => {
+  let currentSession = JSON.parse(localStorage.getItem("currentSession")) || {};
+  currentSession.sessionOpen=false;
+  localStorage.setItem("currentSession",JSON.stringify(currentSession));
+  localStorage.setItem("sessionOpen",JSON.stringify(false));
+  sessionMsg.innerHTML="<div class='text-warning'>⚠️ Session closed.</div>";
+  updateMembersDashboard();
+};
+
+uploadExcelBtn.onclick = () => {
+  const file = excelFileInput.files[0];
+  if(!file) return alert("Select an Excel file first.");
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data,{type:"array"});
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(sheet);
+
+    let addedCount=0;
+    let skippedCount=0;
+    rows.forEach(row=>{
+      const name = row["Full Name"]?.toString().trim();
+      const role = row["Role"]?.toString().trim();
+      const phone = row["Phone"]?.toString().trim();
+      const email = row["Email"]?.toString().trim() || "";
+      const gender = row["Gender"]?.toString().trim();
+
+      if(name && role && phone && gender && !members.some(m=>m.phone===phone)){
+        members.push({id:Date.now().toString()+Math.random(), fullName:name, role, phone, email, gender});
+        addedCount++;
+      } else skippedCount++;
+    });
+    localStorage.setItem("members",JSON.stringify(members));
+    renderMembers();
+    excelMsg.innerHTML=`<div class="alert alert-success">✅ ${addedCount} members added. ${skippedCount>0?skippedCount+" rows skipped (missing required info or duplicate).":""}</div>`;
+    setTimeout(()=>excelMsg.innerHTML="",5000);
+  };
+  reader.readAsArrayBuffer(file);
+};
+
+renderMembers();
+renderRegStatus();
+updateMembersDashboard();
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
