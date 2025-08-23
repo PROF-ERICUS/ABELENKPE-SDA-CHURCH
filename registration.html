@@ -15,17 +15,20 @@
     background-size: cover;
     font-family: 'Segoe UI', sans-serif;
   }
-  header { 
-    background: rgba(247,23,23,0.95); 
-    color:#fff; 
-    padding:1rem 2rem; 
-    display:flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+     body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; background: #f8f9fa; }
+    header { background-color:#f71717; color: white; padding: 1rem; position: fixed; top: 0; width: 100%; z-index: 1000; display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; transition: all 0.3s ease; }
+    header.shrink { padding: 0.5rem 1rem; }
+    header h3 { margin: 0; font-size: 1.5rem; transition: all 0.3s ease; }
+    header.shrink h3 { font-size: 1.2rem; }
+  header img {
+    height: 50px;
+    margin-right: 0.5rem;
+    transition: all 0.3s ease;
   }
-  header img { height:50px; margin-right:10px; }
-  header h3 { margin:0; font-weight:600; font-size:1.4rem; }
+
+  header.shrink img {
+    height: 35px;
+  }
   nav a { margin-left:0.5rem; margin-right:0.5rem; }
   main { 
     flex:1 0 auto; 
@@ -167,3 +170,4 @@ document.getElementById('regForm').addEventListener('submit', e => {
 </script>
 </body>
 </html>
+
