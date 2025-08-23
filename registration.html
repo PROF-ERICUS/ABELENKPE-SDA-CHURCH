@@ -15,29 +15,60 @@
     background-size: cover;
     font-family: 'Segoe UI', sans-serif;
   }
-  header { 
-    background: rgba(247,23,23,0.95); 
-    color:#fff; 
-    padding:1rem 2rem; 
-    display:flex;
-    justify-content: space-between;
+ header {
+    background-color: rgba(247, 23, 23, 0.9);
+    color: white;
+    padding: 1rem;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    display: flex;
     align-items: center;
+    justify-content: center;
     flex-wrap: wrap;
+    transition: all 0.3s ease;
   }
-  header img { height:50px; margin-right:10px; }
-  header h3 { margin:0; font-weight:600; font-size:1.4rem; }
-  nav a { margin-left:0.5rem; margin-right:0.5rem; }
-  main { 
-    flex:1 0 auto; 
-    padding:40px 12px; 
-    max-width:500px; 
-    margin:0 auto; 
+
+  header.shrink {
+    padding: 0.5rem 1rem;
   }
-  footer { 
-    background:#343a40; 
-    color:#fff; 
-    text-align:center; 
-    padding:1rem; 
+
+  header img {
+    height: 50px;
+    margin-right: 0.5rem;
+    transition: all 0.3s ease;
+  }
+
+  header.shrink img {
+    height: 35px;
+  }
+
+  header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  header.shrink h3 {
+    font-size: 1.2rem;
+  }
+
+  main {
+    flex: 1 0 auto;
+    padding-top: 140px;
+    max-width: 900px;
+    margin: auto;
+    backdrop-filter: blur(6px);
+  }
+
+  footer {
+    flex-shrink: 0;
+    background-color: rgba(52, 58, 64, 0.9);
+    color: white;
+    padding: 1rem;
+    text-align: center;
   }
   .card { 
     background: rgba(255,255,255,0.95); 
@@ -45,12 +76,7 @@
     padding:20px; 
     box-shadow: 0 8px 25px rgba(0,0,0,0.2);
   }
-  .fade-alert {
-    opacity:1;
-    transition: opacity 1s ease-out;
-  }
-  .fade-alert.hide {
-    opacity:0;
+ 
   }
 </style>
 </head>
@@ -201,3 +227,4 @@ document.getElementById('regForm').addEventListener('submit', e => {
 </script>
 </body>
 </html>
+
