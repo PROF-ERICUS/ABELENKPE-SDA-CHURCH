@@ -297,6 +297,62 @@ function renderMembers() {
     }
   });
 }
+// ===================== Calendar =====================
+let viewYear, viewMonth; // month: 0-11
+function initCalendarToToday(){
+  const d = new Date();
+  viewYear = d.getFullYear();
+  viewMonth = d.getMonth();
+}
+
+function renderCalendar(){
+  calendar.innerHTML = '';
+  const first = new Date(viewYear, viewMonth, 1);
+  const last = new Date(viewYear, viewMonth + 1, 0);
+  const monthLabel = first.toLocaleDateString(undefined, { month:'long', year:'numeric' });
+  labelMonth.textContent = monthLabel;
+
+  // Weekday offset (0=Sun..6=Sat)
+  const startOffset = first.getDay();
+  const totalCells = startOffset + last.getDate();
+  const todayIso = new Date().toISOString().slice(0,10);
+
+  for(let i=0;i<totalCells;i++){
+    const cell = document.createElement('div');
+    cell.className = 'day';
+    if(i < startOffset){
+      cell.classList.add('muted');
+      cell.textContent = '';
+    } else {
+      const day = i - startOffset + 1;
+      const iso = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      cell.textContent = day;
+      const has = attendanceHistory.some(h=>h.date===iso);
+      if(has) cell.classList.add('has-record');
+      if(iso === selDate.textContent) cell.classList.add('selected');
+
+      cell.addEventListener('click', ()=>{
+        calendar.querySelectorAll('.day').forEach(d=>d.classList.remove('selected'));
+        cell.classList.add('selected');
+        selDate.textContent = iso;
+        renderHistory(iso);
+      });
+    }
+    calendar.appendChild(cell);
+  }
+}
+
+prevMonth.addEventListener('click', ()=>{
+  viewMonth--;
+  if(viewMonth < 0){ viewMonth = 11; viewYear--; }
+  renderCalendar();
+});
+nextMonth.addEventListener('click', ()=>{
+  viewMonth++;
+  if(viewMonth > 11){ viewMonth = 0; viewYear++; }
+  renderCalendar();
+});
+  
 
 // ===================== Mark Present =====================
 function markPresent(phone) {
@@ -411,3 +467,4 @@ document.getElementById('year').textContent = new Date().getFullYear();
 </script>
 </body>
 </html>
+
