@@ -28,10 +28,10 @@ footer { flex-shrink:0; background-color:#343a40; color:white; padding:1rem; tex
 <header class="d-flex align-items-center justify-content-between flex-wrap gap-2">
   <h3 class="mb-0">Attendance</h3>
   <nav class="d-flex gap-2 flex-wrap">
-    <a href="#" class="btn btn-light btn-sm">Home</a>
-    <a href="#" class="btn btn-light btn-sm">Register</a>
-    <a href="#" class="btn btn-light btn-sm">Admin</a>
-    <a href="#" class="btn btn-light btn-sm">Attendance</a>
+   <a href="index.html" class="btn btn-light btn-sm">Home</a>
+    <a href="registration.html" class="btn btn-light btn-sm">Register</a>
+    <a href="admin-dash.html" class="btn btn-light btn-sm">Admin</a>
+    <a href="session.html" class="btn btn-light btn-sm">Attendance</a>
   </nav>
 </header>
 
@@ -177,8 +177,19 @@ function renderMembers(){
     li.innerHTML=`
       <span>${m.fullName} (${m.role}) - ${m.phone} <strong>${present?'Present':'Absent'}</strong></span>
       <input type="checkbox" class="select-member" data-phone="${m.phone}" ${!present?'checked':''}/>
+      <button class="btn btn-sm btn-success mark-btn" data-phone="${m.phone}">${present?'Mark Absent':'Mark Present'}</button>
     `;
     listMembers.appendChild(li);
+  });
+
+  document.querySelectorAll('.mark-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const phone=btn.dataset.phone;
+      if(currentSession.presentPhones.includes(phone)){
+        currentSession.presentPhones=currentSession.presentPhones.filter(p=>p!==phone);
+      }else currentSession.presentPhones.push(phone);
+      saveSession(); updateStats(); renderMembers();
+    });
   });
 }
 
