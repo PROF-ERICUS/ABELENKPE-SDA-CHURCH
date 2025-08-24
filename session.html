@@ -554,37 +554,52 @@ btnExportAbsentees.addEventListener('click', ()=>{
 });
 
 // ===================== Print (attendance only) =====================
+// ===================== Print Today Attendance =====================
 btnPrint.addEventListener('click', ()=>{
   const date = inDate.value || '—';
   const presentSet = new Set(currentSession.presentPhones);
+
   const section = document.createElement('div');
   section.innerHTML = `
-    <h2 style="margin-bottom:8px;">Attendance – ${date}</h2>
-    <table style="width:100%; border-collapse: collapse;" border="1">
-      <thead>
-        <tr><th>Name</th><th>Phone</th><th>Role</th><th>Status</th></tr>
+    <div style="text-align:center; margin-bottom:15px;">
+      <img src="images/sda logo.png" alt="Logo" style="height:80px; margin-bottom:10px;">
+      <h2 style="margin:0;">Official Attendance Sheet</h2>
+      <p style="margin:0;">Date: ${date}</p>
+    </div>
+    <table style="width:100%; border-collapse: collapse; font-size:14px;" border="1">
+      <thead style="background:#f2f2f2;">
+        <tr>
+          <th style="padding:6px;">Name</th>
+          <th style="padding:6px;">Phone</th>
+          <th style="padding:6px;">Role</th>
+          <th style="padding:6px;">Gender</th>
+          <th style="padding:6px;">Status</th>
+        </tr>
       </thead>
       <tbody>
         ${members.map(m=>`
           <tr>
-            <td>${m.fullName}</td>
-            <td>${m.phone}</td>
-            <td>${m.role}</td>
-            <td>${presentSet.has(m.phone)?'Present':'Absent'}</td>
+            <td style="padding:6px;">${m.fullName}</td>
+            <td style="padding:6px;">${m.phone}</td>
+            <td style="padding:6px;">${m.role}</td>
+            <td style="padding:6px;">${m.gender || '—'}</td>
+            <td style="padding:6px;">${presentSet.has(m.phone)?'Present':'Absent'}</td>
           </tr>`).join('')}
       </tbody>
     </table>`;
+  
   document.body.appendChild(section);
   window.print();
   section.remove();
 });
 
-// ===================== Print History =====================
+// ===================== Print History Attendance =====================
 btnPrintHistory.addEventListener('click',()=>{
   const date = selDate.textContent;
   if(!date || date==='—'){ return showToast('Select a date first'); }
   const record = attendanceHistory.find(h=>h.date===date);
   if(!record){ return showToast('No record for this date'); }
+
   const filter = printHistoryFilter.value;
   let listToPrint = [];
   if(filter==='all') listToPrint = members;
@@ -593,21 +608,33 @@ btnPrintHistory.addEventListener('click',()=>{
 
   const section = document.createElement('div');
   section.innerHTML = `
-    <h2 style="margin-bottom:8px;">Attendance – ${date}</h2>
-    <table style="width:100%; border-collapse: collapse;" border="1">
-      <thead>
-        <tr><th>Name</th><th>Phone</th><th>Role</th><th>Status</th></tr>
+    <div style="text-align:center; margin-bottom:15px;">
+      <img src="logo.png" alt="Logo" style="height:80px; margin-bottom:10px;">
+      <h2 style="margin:0;">Official Attendance Sheet</h2>
+      <p style="margin:0;">Date: ${date}</p>
+    </div>
+    <table style="width:100%; border-collapse: collapse; font-size:14px;" border="1">
+      <thead style="background:#f2f2f2;">
+        <tr>
+          <th style="padding:6px;">Name</th>
+          <th style="padding:6px;">Phone</th>
+          <th style="padding:6px;">Role</th>
+          <th style="padding:6px;">Gender</th>
+          <th style="padding:6px;">Status</th>
+        </tr>
       </thead>
       <tbody>
         ${listToPrint.map(m=>`
           <tr>
-            <td>${m.fullName}</td>
-            <td>${m.phone}</td>
-            <td>${m.role}</td>
-            <td>${record.presentPhones.includes(m.phone)?'Present':'Absent'}</td>
+            <td style="padding:6px;">${m.fullName}</td>
+            <td style="padding:6px;">${m.phone}</td>
+            <td style="padding:6px;">${m.role}</td>
+            <td style="padding:6px;">${m.gender || '—'}</td>
+            <td style="padding:6px;">${record.presentPhones.includes(m.phone)?'Present':'Absent'}</td>
           </tr>`).join('')}
       </tbody>
     </table>`;
+
   document.body.appendChild(section);
   window.print();
   section.remove();
@@ -656,4 +683,5 @@ if(attendanceHistory.some(h=>h.date===todayIso)){
 </script>
 </body>
 </html>
+
 
