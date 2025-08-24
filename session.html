@@ -267,14 +267,22 @@ function nowDefaults(){
 
 function showToast(text){ toastMsg.textContent = text; toast.show(); }
 
+
 function updateStats(){
   statTotal.textContent = members.length;
-  statPresent.textContent = currentSession.presentPhones.length;
-  statAbsent.textContent = Math.max(0, members.length - currentSession.presentPhones.length);
-  pillSession.innerHTML = currentSession.active
-    ? `<span class='text-dark bg-warning badge'><i class='bi bi-broadcast-pin'></i> Active: ${currentSession.date} ${currentSession.time}</span>`
-    : `<span class='badge bg-secondary'>No Active Session</span>`;
+  
+  if(currentSession.active){
+    statPresent.textContent = currentSession.presentPhones.length;
+    statAbsent.textContent = Math.max(0, members.length - currentSession.presentPhones.length);
+    pillSession.innerHTML = `<span class='text-dark bg-warning badge'><i class='bi bi-broadcast-pin'></i> Active: ${currentSession.date} ${currentSession.time}</span>`;
+  } else {
+    statPresent.textContent = 0;
+    statAbsent.textContent = 0;
+    pillSession.innerHTML = `<span class='badge bg-secondary'>No Active Session</span>`;
+  }
 }
+
+
 
 function filteredMembers(){
   const q = (search.value || '').toLowerCase();
@@ -591,19 +599,19 @@ btnPrintHistory.addEventListener('click',()=>{
 
 // ===================== Clear Today =====================
 btnClearToday.addEventListener('click', ()=>{
-  if(!currentSession.active) {
+  if(currentSession.active){
     currentSession.presentPhones = [];
     saveSession();
-    updateStats();
-    renderMembers();
-    return showToast('Cleared today’s marks (no active session).');
+    showToast('Cleared all marks for the active session.');
+  } else {
+    showToast('No active session. Dashboard shows 0 absent until next session.');
   }
-  currentSession.presentPhones = [];
-  saveSession();
+
   updateStats();
   renderMembers();
-  showToast('Cleared all marks for the active session.');
 });
+
+
 
 // ===================== Search/Filter =====================
 search.addEventListener('input', renderMembers);
