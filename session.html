@@ -440,19 +440,33 @@ function renderHistory(date){
   listHistory.innerHTML = '';
   selDate.textContent = date;
   const record = attendanceHistory.find(h => h.date===date);
-  if(!record){ listHistory.innerHTML='<li class="list-group-item">No record</li>'; return; }
+  if(!record){ 
+    listHistory.innerHTML='<li class="list-group-item">No record</li>'; 
+    return; 
+  }
+
   const showPresent = viewPresent.checked;
   const listToShow = showPresent
     ? members.filter(m => record.presentPhones.includes(m.phone))
     : members.filter(m => !record.presentPhones.includes(m.phone));
 
-  listHistory.innerHTML = listToShow.map(m => `
-    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
-      <span><strong>${m.fullName}</strong> <span class="badge bg-info badge-role">${m.role}</span></span>
-      <span>${record.presentPhones.includes(m.phone)?'Present':'Absent'}</span>
-    </li>
-  `).join('');
+  listHistory.innerHTML = listToShow.map(m => {
+    const isPresent = record.presentPhones.includes(m.phone);
+    return `
+      <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span class="d-flex align-items-center gap-2">
+          ${!isPresent ? `<input type="checkbox" class="chkNotify" data-phone="${m.phone}">` : ``}
+          <strong>${m.fullName}</strong>
+          <span class="badge bg-info badge-role">${m.role}</span>
+        </span>
+        <span>${isPresent 
+          ? '<span class="badge bg-success">Present</span>' 
+          : '<span class="badge bg-danger">Absent</span>'}</span>
+      </li>
+    `;
+  }).join('');
 }
+
 viewPresent.addEventListener('change', ()=> selDate.textContent!=='—' && renderHistory(selDate.textContent));
 viewAbsent .addEventListener('change', ()=> selDate.textContent!=='—' && renderHistory(selDate.textContent));
 
@@ -642,3 +656,4 @@ if(attendanceHistory.some(h=>h.date===todayIso)){
 </script>
 </body>
 </html>
+
