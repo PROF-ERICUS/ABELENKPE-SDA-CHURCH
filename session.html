@@ -5,360 +5,268 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Attendance – ABELENKPE SDA CHURCH</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
 body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; background: #f8f9fa; }
-header { background-color:#f71717; color: white; padding: 1rem; position: fixed; top: 0; width: 100%; z-index: 1000; display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; transition: all 0.3s ease; }
-header h3 { margin: 0; font-size: 1.5rem; }
-nav a { margin: 0.3rem; }
+header { background-color:#f71717; color: white; padding: 1rem; position: fixed; top: 0; width: 100%; z-index: 1000; display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; }
+header h3 { margin: 0; }
 main { flex: 1 0 auto; padding: 120px 15px 20px; max-width: 1100px; margin: auto; }
 .card { margin-bottom: 20px; }
 footer { flex-shrink: 0; background-color: #343a40; color: white; padding: 1rem; text-align: center; font-size: 0.9rem; }
-#backToTop { position: fixed; bottom: 40px; right: 20px; display: none; z-index: 999; border-radius: 50%; width: 45px; height: 45px; font-size: 24px; line-height: 1; padding: 0; }
-.stat-card { border-radius:14px; color:#fff; box-shadow:0 8px 20px rgba(0,0,0,.15); }
+
+.stat-card { border-radius:14px; color:#fff; box-shadow:0 8px 20px rgba(0,0,0,.15); text-align:center; padding:1rem;}
 .stat-all { background:linear-gradient(135deg,#ff416c,#ff4b2b); }
 .stat-present { background:linear-gradient(135deg,#00c6ff,#0072ff); }
 .stat-absent { background:linear-gradient(135deg,#8e2de2,#4a00e0); }
-.badge-role { font-size:.8rem; }
-.present-pill { font-size:.8rem; }
-.floating-tools { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:999; }
+
 .calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
 .calendar .day { background:#fff; border-radius:8px; border:1px solid #e5e7eb; padding:8px; text-align:center; cursor:pointer; }
 .calendar .day.has-record { background:linear-gradient(135deg,#f71717,#ff5252); color:#fff; font-weight:600; }
 .calendar .day.selected { outline:2px solid #212529; }
+
+.history-checkbox { margin-right: 10px; }
 </style>
 </head>
 <body>
 <header class="d-flex align-items-center justify-content-between flex-wrap gap-2">
   <h3 class="mb-0">Attendance</h3>
   <nav class="d-flex gap-2 flex-wrap">
-   <a href="index.html" class="btn btn-light btn-sm">Home</a>
-   <a href="registration.html" class="btn btn-light btn-sm">Register</a>
-   <a href="admin-dash.html" class="btn btn-light btn-sm">Admin</a>
-   <a href="session.html" class="btn btn-light btn-sm">Attendance</a>
+    <a href="#" class="btn btn-light btn-sm">Home</a>
+    <a href="#" class="btn btn-light btn-sm">Register</a>
+    <a href="#" class="btn btn-light btn-sm">Admin</a>
+    <a href="#" class="btn btn-light btn-sm">Attendance</a>
   </nav>
 </header>
 
 <main>
-<h2 class="text-center mb-4">📅 Attendance Session</h2>
+  <h2 class="text-center mb-4">📅 Attendance Session</h2>
 
-<!-- Stats -->
-<div class="row g-3 mb-3">
-  <div class="col-md-4">
-    <div class="p-3 stat-card stat-all text-center">
-      <i class="bi bi-people-fill fs-1"></i>
-      <div class="fw-semibold">Total Members</div>
-      <div id="statTotal" class="display-6">0</div>
-    </div>
+  <!-- Stats -->
+  <div class="row g-3 mb-3">
+    <div class="col-md-4"><div class="stat-card stat-all"><i class="fas fa-users fa-2x"></i><div>Total Members</div><div id="statTotal" class="display-6">0</div></div></div>
+    <div class="col-md-4"><div class="stat-card stat-present"><i class="fas fa-user-check fa-2x"></i><div>Present</div><div id="statPresent" class="display-6">0</div></div></div>
+    <div class="col-md-4"><div class="stat-card stat-absent"><i class="fas fa-user-xmark fa-2x"></i><div>Absent</div><div id="statAbsent" class="display-6">0</div></div></div>
   </div>
-  <div class="col-md-4">
-    <div class="p-3 stat-card stat-present text-center">
-      <i class="bi bi-person-check-fill fs-1"></i>
-      <div class="fw-semibold">Present</div>
-      <div id="statPresent" class="display-6">0</div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="p-3 stat-card stat-absent text-center">
-      <i class="bi bi-person-x-fill fs-1"></i>
-      <div class="fw-semibold">Absent</div>
-      <div id="statAbsent" class="display-6">0</div>
-    </div>
-  </div>
-</div>
 
-<!-- Session Controls -->
-<div class="card mb-3">
-  <div class="card-body">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-      <h5 class="mb-0">Session</h5>
-      <div id="pillSession" class="badge bg-secondary">No Active Session</div>
-    </div>
-    <div class="row g-2 mt-2">
-      <div class="col-md-4">
-        <label class="form-label">Date</label>
-        <input id="inDate" type="date" class="form-control" />
+  <!-- Session Controls -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h5 class="mb-0">Session</h5>
+        <div id="pillSession" class="badge bg-secondary">No Active Session</div>
       </div>
-      <div class="col-md-4">
-        <label class="form-label">Time</label>
-        <input id="inTime" type="time" class="form-control" />
-      </div>
-      <div class="col-md-4 d-grid d-md-flex align-items-end gap-2">
-        <button id="btnStart" class="btn btn-primary flex-fill">Start</button>
-        <button id="btnClose" class="btn btn-danger flex-fill">Close & Save</button>
-      </div>
-    </div>
-    <div id="msg" class="mt-2"></div>
-  </div>
-</div>
-
-<!-- Quick Mark -->
-<div class="card mb-3">
-  <div class="card-body">
-    <h5 class="card-title">Quick Mark by Phone</h5>
-    <div class="input-group">
-      <input id="inPhone" class="form-control" placeholder="Enter member phone" />
-      <button id="btnMark" class="btn btn-success"><i class="bi bi-check2-square"></i> Mark</button>
-    </div>
-    <small class="text-muted">Tip: click green buttons in the list below too.</small>
-  </div>
-</div>
-
-<!-- Members List -->
-<div class="card mb-3">
-  <div class="card-body">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-      <h5 class="mb-0">Members</h5>
-      <div class="d-flex gap-2">
-        <input id="search" type="search" class="form-control" placeholder="Search name, phone, role..." />
-        <select id="roleFilter" class="form-select">
-          <option value="">All Roles</option>
-          <option>Class 1</option><option>Class 2</option><option>Class 3</option>
-          <option>Class 4</option><option>Class 5</option><option>Class 6</option>
-          <option>Class 7</option><option>Class 8</option><option>Class 9</option>
-          <option>Class 10</option><option>Class 11</option><option>Class 12</option>
-          <option>Other</option>
-        </select>
-      </div>
-    </div>
-    <ul id="listMembers" class="list-group"></ul>
-  </div>
-</div>
-
-<!-- Calendar & History -->
-<div class="card mb-4">
-  <div class="card-body">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-      <h5 class="mb-0">Attendance History</h5>
-    </div>
-    <div class="row g-3 mt-1">
-      <div class="col-md-6">
-        <div class="calendar p-2 border rounded bg-white" id="calendar"></div>
-        <div class="mt-2 d-flex justify-content-between">
-          <button id="prevMonth" class="btn btn-sm btn-light">◀ Prev</button>
-          <span id="labelMonth" class="fw-semibold"></span>
-          <button id="nextMonth" class="btn btn-sm btn-light">Next ▶</button>
+      <div class="row g-2 mt-2">
+        <div class="col-md-4"><label>Date</label><input id="inDate" type="date" class="form-control" /></div>
+        <div class="col-md-4"><label>Time</label><input id="inTime" type="time" class="form-control" /></div>
+        <div class="col-md-4 d-grid d-md-flex align-items-end gap-2">
+          <button id="btnStart" class="btn btn-primary flex-fill">Start</button>
+          <button id="btnClose" class="btn btn-danger flex-fill">Close & Save</button>
         </div>
       </div>
-      <div class="col-md-6">
-        <div class="d-flex justify-content-between align-items-center mb-1">
-          <div class="fw-semibold">Selected Date: <span id="selDate">—</span></div>
-          <div class="btn-group btn-group-sm" role="group">
-            <input type="radio" class="btn-check" name="viewMode" id="viewPresent" autocomplete="off" checked>
-            <label class="btn btn-outline-success" for="viewPresent">Present</label>
-            <input type="radio" class="btn-check" name="viewMode" id="viewAbsent" autocomplete="off">
-            <label class="btn btn-outline-danger" for="viewAbsent">Absent</label>
+      <div id="msg" class="mt-2"></div>
+    </div>
+  </div>
+
+  <!-- Members List -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5>Members</h5>
+      <ul id="listMembers" class="list-group"></ul>
+    </div>
+  </div>
+
+  <!-- Calendar & History -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5>Attendance History</h5>
+      <div class="row g-3 mt-1">
+        <div class="col-md-6">
+          <div class="calendar p-2 border rounded bg-white" id="calendar"></div>
+          <div class="mt-2 d-flex justify-content-between">
+            <button id="prevMonth" class="btn btn-sm btn-light">◀ Prev</button>
+            <span id="labelMonth" class="fw-semibold"></span>
+            <button id="nextMonth" class="btn btn-sm btn-light">Next ▶</button>
           </div>
         </div>
-        <ul id="listHistory" class="list-group" style="max-height:300px; overflow:auto;"></ul>
-        <div class="d-grid gap-2 mt-2">
-          <button id="btnNotifySelDate" class="btn btn-warning">Notify Selected Absentees</button>
+        <div class="col-md-6">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <div class="fw-semibold">Selected Date: <span id="selDate">—</span></div>
+            <div class="btn-group btn-group-sm" role="group">
+              <input type="radio" class="btn-check" name="viewMode" id="viewPresent" autocomplete="off" checked>
+              <label class="btn btn-outline-success" for="viewPresent">Present</label>
+              <input type="radio" class="btn-check" name="viewMode" id="viewAbsent" autocomplete="off">
+              <label class="btn btn-outline-danger" for="viewAbsent">Absent</label>
+            </div>
+          </div>
+          <ul id="listHistory" class="list-group" style="max-height:300px; overflow:auto;"></ul>
+          <div class="d-grid gap-2 mt-2">
+            <button id="btnNotifySelDate" class="btn btn-warning">Notify Selected Absentees</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </main>
 
 <footer>
-  &copy; <span id="year"></span> ABELENKPE SDA CHURCH. All Rights Reserved.
+  &copy; <span id="year"></span> ABELENKPE SDA CHURCH
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// ===================== Local Storage =====================
-const LS_KEYS = { members:'members', session:'currentSession', history:'attendanceHistory' };
+// ===== Local Storage =====
+const LS_KEYS = {
+  members: 'members',
+  session: 'currentSession',
+  history: 'attendanceHistory'
+};
 let members = JSON.parse(localStorage.getItem(LS_KEYS.members)) || [];
-let currentSession = JSON.parse(localStorage.getItem(LS_KEYS.session)) || {active:false, date:null, time:null, presentPhones:[]};
+let currentSession = JSON.parse(localStorage.getItem(LS_KEYS.session)) || { active:false, date:null, time:null, presentPhones:[] };
 let attendanceHistory = JSON.parse(localStorage.getItem(LS_KEYS.history)) || [];
 
-// ===================== Elements =====================
-const statTotal=document.getElementById('statTotal');
-const statPresent=document.getElementById('statPresent');
-const statAbsent=document.getElementById('statAbsent');
-const pillSession=document.getElementById('pillSession');
-const msg=document.getElementById('msg');
-const inDate=document.getElementById('inDate');
-const inTime=document.getElementById('inTime');
-const inPhone=document.getElementById('inPhone');
-const btnStart=document.getElementById('btnStart');
-const btnClose=document.getElementById('btnClose');
-const btnMark=document.getElementById('btnMark');
-const search=document.getElementById('search');
-const roleFilter=document.getElementById('roleFilter');
-const listMembers=document.getElementById('listMembers');
-const calendar=document.getElementById('calendar');
-const labelMonth=document.getElementById('labelMonth');
-const prevMonth=document.getElementById('prevMonth');
-const nextMonth=document.getElementById('nextMonth');
-const selDate=document.getElementById('selDate');
-const listHistory=document.getElementById('listHistory');
-const viewPresent=document.getElementById('viewPresent');
-const viewAbsent=document.getElementById('viewAbsent');
-const btnNotifySelDate=document.getElementById('btnNotifySelDate');
+// ===== Elements =====
+const statTotal = document.getElementById('statTotal');
+const statPresent = document.getElementById('statPresent');
+const statAbsent = document.getElementById('statAbsent');
+const pillSession = document.getElementById('pillSession');
+const listMembers = document.getElementById('listMembers');
+const inDate = document.getElementById('inDate');
+const inTime = document.getElementById('inTime');
+const btnStart = document.getElementById('btnStart');
+const btnClose = document.getElementById('btnClose');
+const calendar = document.getElementById('calendar');
+const labelMonth = document.getElementById('labelMonth');
+const prevMonth = document.getElementById('prevMonth');
+const nextMonth = document.getElementById('nextMonth');
+const selDate = document.getElementById('selDate');
+const listHistory = document.getElementById('listHistory');
+const viewPresent = document.getElementById('viewPresent');
+const viewAbsent = document.getElementById('viewAbsent');
+const btnNotifySelDate = document.getElementById('btnNotifySelDate');
 
-// ===================== Utils =====================
-const saveMembers = () => localStorage.setItem(LS_KEYS.members, JSON.stringify(members));
-const saveSession = () => localStorage.setItem(LS_KEYS.session, JSON.stringify(currentSession));
-const saveHistory = () => localStorage.setItem(LS_KEYS.history, JSON.stringify(attendanceHistory));
-const showToast = t=>alert(t);
-const isPresent = phone => currentSession.presentPhones.includes(phone);
-const updateStats = ()=>{
+// ===== Utils =====
+const saveMembers = ()=>localStorage.setItem(LS_KEYS.members, JSON.stringify(members));
+const saveSession = ()=>localStorage.setItem(LS_KEYS.session, JSON.stringify(currentSession));
+const saveHistory = ()=>localStorage.setItem(LS_KEYS.history, JSON.stringify(attendanceHistory));
+function showToast(msg){ alert(msg); }
+function updateStats(){
   statTotal.textContent = members.length;
   statPresent.textContent = currentSession.presentPhones.length;
-  statAbsent.textContent = currentSession.active ? Math.max(0, members.length-currentSession.presentPhones.length) : 0;
-  pillSession.innerHTML=currentSession.active?`<span class='text-dark bg-warning badge'><i class='bi bi-broadcast-pin'></i> Active: ${currentSession.date} ${currentSession.time}</span>`:`<span class='badge bg-secondary'>No Active Session</span>`;
-};
-const filteredMembers = ()=>members.filter(m=>{
-  const q=(search.value||'').toLowerCase();
-  const role=roleFilter.value;
-  const hitQ=!q||`${m.fullName} ${m.phone} ${m.role}`.toLowerCase().includes(q);
-  const hitRole=!role||m.role===role;
-  return hitQ&&hitRole;
-});
-
-// ===================== Render Members =====================
+  statAbsent.textContent = Math.max(0, members.length - currentSession.presentPhones.length);
+  pillSession.innerHTML = currentSession.active
+    ? `<span class='badge bg-warning text-dark'>Active: ${currentSession.date}</span>`
+    : `<span class='badge bg-secondary'>No Active Session</span>`;
+}
 function renderMembers(){
   listMembers.innerHTML='';
-  const list=filteredMembers();
-  if(!list.length){ listMembers.innerHTML="<li class='list-group-item'>No members.</li>"; return;}
-  list.forEach(m=>{
-    const li=document.createElement('li');
-    li.className='list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2';
-    const present=isPresent(m.phone);
-    li.innerHTML=`<span class="d-flex align-items-center gap-2 flex-wrap">
-      <strong>${m.fullName}</strong>
-      <span class="badge bg-dark-subtle text-dark badge-role">${m.role}</span>
-      <span class="text-muted"><i class="fas fa-phone"></i> ${m.phone}</span>
-      <span class="badge ${present?'bg-success':'bg-secondary'} present-pill">${present?'Present':'Absent'}</span>
-    </span>
-    <div class="d-flex gap-1 flex-wrap">
+  members.forEach(m=>{
+    const present = currentSession.presentPhones.includes(m.phone);
+    const li = document.createElement('li');
+    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+    li.innerHTML = `
+      ${m.fullName} (${m.role}) 
       <button class="btn btn-sm ${present?'btn-outline-success':'btn-success'} btn-toggle" data-phone="${m.phone}">
-        <i class="bi bi-check2-square"></i> ${present?'Mark Absent':'Mark Present'}
+        ${present?'Mark Absent':'Mark Present'}
       </button>
-      <a class="btn btn-sm btn-outline-primary" href="tel:${m.phone}"><i class="fas fa-phone"></i></a>
-      <a class="btn btn-sm btn-outline-success" target="_blank" href="https://wa.me/${m.phone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent('We missed you at church today!')}" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-    </div>`;
+    `;
     listMembers.appendChild(li);
   });
-  listMembers.querySelectorAll('.btn-toggle').forEach(btn=>btn.addEventListener('click',()=>{
-    if(!currentSession.active){ showToast('Start a session first'); return; }
-    const phone=btn.getAttribute('data-phone');
-    const i=currentSession.presentPhones.indexOf(phone);
-    if(i===-1) currentSession.presentPhones.push(phone); else currentSession.presentPhones.splice(i,1);
-    saveSession(); updateStats(); renderMembers();
-  }));
+  document.querySelectorAll('.btn-toggle').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(!currentSession.active){ showToast('Start a session first'); return; }
+      const phone = btn.getAttribute('data-phone');
+      const i = currentSession.presentPhones.indexOf(phone);
+      if(i===-1) currentSession.presentPhones.push(phone); else currentSession.presentPhones.splice(i,1);
+      saveSession(); updateStats(); renderMembers();
+    });
+  });
 }
 
-// ===================== Quick Mark =====================
-btnMark.addEventListener('click',()=>{
-  if(!currentSession.active){ showToast('Start a session first'); return; }
-  const phone=(inPhone.value||'').trim();
-  if(!phone) return;
-  const m=members.find(x=>x.phone===phone);
-  if(!m){ showToast('Member not found'); return;}
-  if(!isPresent(phone)) currentSession.presentPhones.push(phone);
-  saveSession(); updateStats(); renderMembers(); inPhone.value=''; showToast('Marked present');
+// ===== Session =====
+btnStart.addEventListener('click', ()=>{
+  currentSession={ active:true, date: inDate.value || new Date().toISOString().slice(0,10), time: inTime.value || new Date().toTimeString().slice(0,5), presentPhones:[] };
+  saveSession(); updateStats(); renderMembers();
 });
 
-// ===================== Session Controls =====================
-btnStart.addEventListener('click',()=>{
-  currentSession={active:true, date:inDate.value||new Date().toISOString().slice(0,10), time:inTime.value||new Date().toTimeString().slice(0,5), presentPhones:[]};
-  saveSession(); updateStats(); renderMembers(); showToast('Session started');
-});
-
-btnClose.addEventListener('click',()=>{
+btnClose.addEventListener('click', ()=>{
   if(!currentSession.active){ showToast('No active session'); return; }
-  attendanceHistory.push({...currentSession, closedAt:new Date().toISOString()});
+  attendanceHistory.push({ ...currentSession, closedAt: new Date().toISOString() });
   saveHistory();
-  currentSession={active:false,date:null,time:null,presentPhones:[]};
-  saveSession(); updateStats(); renderMembers(); buildCalendar(); showToast('Session closed and saved');
+  currentSession = { active:false, date:null, time:null, presentPhones:[] };
+  saveSession(); updateStats(); renderMembers(); buildCalendar();
+  showToast('Session closed and saved');
 });
 
-// ===================== Calendar / History =====================
-let calMonth=(new Date()).getMonth();
-let calYear=(new Date()).getFullYear();
-
+// ===== Calendar =====
+let calMonth=(new Date()).getMonth(); let calYear=(new Date()).getFullYear();
 function buildCalendar(){
-  calendar.innerHTML='';
-  const firstDay=new Date(calYear,calMonth,1).getDay();
-  const days=new Date(calYear,calMonth+1,0).getDate();
+  calendar.innerHTML=''; const firstDay=new Date(calYear,calMonth,1).getDay(); const days=new Date(calYear,calMonth+1,0).getDate();
   labelMonth.textContent=`${calYear}-${String(calMonth+1).padStart(2,'0')}`;
-  for(let i=0;i<firstDay;i++) calendar.appendChild(Object.assign(document.createElement('div'),{className:'day'}));
+  for(let i=0;i<firstDay;i++){ calendar.appendChild(document.createElement('div')); }
   for(let d=1;d<=days;d++){
     const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const has=attendanceHistory.some(s=>s.date===dateStr);
-    const div=document.createElement('div');
-    div.className='day'+(has?' has-record':'');
-    div.textContent=d;
-    div.title=dateStr;
+    const div=document.createElement('div'); div.className='day'+(has?' has-record':''); div.textContent=d; div.title=dateStr;
     div.addEventListener('click',()=>selectCalendarDate(dateStr,div));
     calendar.appendChild(div);
   }
 }
-
 function selectCalendarDate(dateStr,el){
   calendar.querySelectorAll('.day').forEach(d=>d.classList.remove('selected'));
-  el.classList.add('selected');
-  selDate.textContent=dateStr;
-  renderHistoryList(dateStr);
+  el.classList.add('selected'); selDate.textContent=dateStr; renderHistoryList(dateStr);
 }
 
+// ===== History =====
 function renderHistoryList(dateStr){
   listHistory.innerHTML='';
   const session = attendanceHistory.find(x=>x.date===dateStr);
-  if(!session){ listHistory.innerHTML="<li class='list-group-item'>No records for this date.</li>"; btnNotifySelDate.disabled=true; return; }
-  const showAbsent=viewAbsent.checked;
-  const list=showAbsent? members.filter(m=>!session.presentPhones.includes(m.phone)) : members.filter(m=>session.presentPhones.includes(m.phone));
+  if(!session){ listHistory.innerHTML="<li class='list-group-item'>No records.</li>"; btnNotifySelDate.disabled=true; return; }
+  const showAbsent = viewAbsent.checked;
+  const list = showAbsent
+    ? members.filter(m=>!session.presentPhones.includes(m.phone))
+    : members.filter(m=>session.presentPhones.includes(m.phone));
   if(!list.length){ listHistory.innerHTML=`<li class='list-group-item'>No ${showAbsent?'absentees':'present'} on this date.</li>`; btnNotifySelDate.disabled=true; return; }
   list.forEach(member=>{
-    const li=document.createElement('li');
-    li.className='list-group-item d-flex justify-content-between align-items-center';
-    if(showAbsent && !session.active){
-      li.innerHTML=`
-        <div class="form-check d-flex align-items-center gap-2">
-          <input class="form-check-input history-checkbox" type="checkbox" value="${member.phone}" id="chk-${member.phone}">
-          <label class="form-check-label" for="chk-${member.phone}">${member.fullName} (${member.role})</label>
-          <a class="btn btn-sm btn-outline-primary" href="tel:${member.phone}" title="Call"><i class="fas fa-phone"></i></a>
-          <a class="btn btn-sm btn-outline-success" target="_blank" href="https://wa.me/${member.phone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent('We missed you at church on '+session.date)}" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-        </div>`;
-    } else {
-      li.textContent = `${member.fullName} (${member.role})`;
-    }
+    const li=document.createElement('li'); li.className='list-group-item d-flex justify-content-between align-items-center';
+    if(showAbsent){
+      li.innerHTML = `<div class="form-check">
+        <input class="form-check-input history-checkbox" type="checkbox" value="${member.phone}" id="chk-${member.phone}">
+        <label class="form-check-label" for="chk-${member.phone}">${member.fullName} (${member.role})</label>
+        <a class="btn btn-sm btn-outline-primary" href="tel:${member.phone}"><i class="fas fa-phone"></i></a>
+        <a class="btn btn-sm btn-outline-success" target="_blank" href="https://wa.me/${member.phone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent('We missed you at church on '+session.date)}"><i class="fab fa-whatsapp"></i></a>
+      </div>`;
+    } else { li.textContent = `${member.fullName} (${member.role})`; }
     listHistory.appendChild(li);
   });
-  btnNotifySelDate.disabled=!(showAbsent && !session.active && list.length>0);
+  btnNotifySelDate.disabled = !(showAbsent && list.length>0);
 }
 
-// View toggle
-viewPresent.addEventListener('change',()=>{ if(viewPresent.checked) renderHistoryList(selDate.textContent); });
-viewAbsent.addEventListener('change',()=>{ if(viewAbsent.checked) renderHistoryList(selDate.textContent); });
+viewPresent.addEventListener('change',()=>renderHistoryList(selDate.textContent));
+viewAbsent.addEventListener('change',()=>renderHistoryList(selDate.textContent));
+prevMonth.addEventListener('click',()=>{ calMonth--; if(calMonth<0){ calMonth=11; calYear--; } buildCalendar(); });
+nextMonth.addEventListener('click',()=>{ calMonth++; if(calMonth>11){ calMonth=0; calYear++; } buildCalendar(); });
 
-// Notification
+// ===== Notify Selected =====
 btnNotifySelDate.addEventListener('click',()=>{
-  const date=selDate.textContent;
-  if(!date||date==='—'){ showToast('Pick a date'); return;}
-  const session=attendanceHistory.find(x=>x.date===date);
-  if(!session){ showToast('No records for selected date'); return; }
-  const checkboxes=document.querySelectorAll('.history-checkbox:checked');
-  if(!checkboxes.length){ showToast('Select at least one absentee'); return; }
-  const phones=Array.from(checkboxes).map(cb=>cb.value);
-  const text=`Hello, we missed you at church on ${date}. Hope you are well. — ABELENKPE SDA CHURCH`;
-  if(confirm('Send WhatsApp messages to selected absentees?')){
-    phones.forEach(p=>window.open(`https://wa.me/${p.replace(/[^0-9]/g,'')}?text=${encodeURIComponent(text)}`));
-  }
+  const checkedBoxes = document.querySelectorAll('.history-checkbox:checked');
+  if(!checkedBoxes.length){ showToast('Select at least one absentee'); return; }
+  checkedBoxes.forEach(cb=>{
+    const phone = cb.value;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent('We missed you at church on '+selDate.textContent)}`, '_blank');
+  });
 });
 
-// ===================== Calendar Nav =====================
-prevMonth.addEventListener('click',()=>{ calMonth--; if(calMonth<0){calMonth=11; calYear--;} buildCalendar(); });
-nextMonth.addEventListener('click',()=>{ calMonth++; if(calMonth>11){calMonth=0; calYear++;} buildCalendar(); });
-
-// ===================== Init =====================
-updateStats();
-renderMembers();
-buildCalendar();
-document.getElementById('year').textContent=new Date().getFullYear();
+// ===== Init =====
+(function init(){
+  document.getElementById('year').textContent = new Date().getFullYear();
+  if(!members.length){ members=[
+    { fullName:'John Doe', role:'Class 1', phone:'0541111111' },
+    { fullName:'Mary Ann', role:'Class 5', phone:'0542222222' },
+    { fullName:'Peter Smith', role:'Other', phone:'0543333333' }
+  ]; saveMembers(); }
+  inDate.value = new Date().toISOString().slice(0,10);
+  inTime.value = new Date().toTimeString().slice(0,5);
+  updateStats(); renderMembers(); buildCalendar();
+})();
 </script>
 </body>
 </html>
