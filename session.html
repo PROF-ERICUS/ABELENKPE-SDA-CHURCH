@@ -228,6 +228,7 @@ const viewAbsent = document.getElementById('viewAbsent');
 
 const btnNotifySelected = document.getElementById('btnNotifySelected');
 const selectAllCheckbox = document.getElementById('selectAll');
+const btnNotifySelDate = document.getElementById('btnNotifySelDate');
 
 // ===================== Utils =====================
 const saveMembers = () => localStorage.setItem(LS_KEYS.members, JSON.stringify(members));
@@ -240,12 +241,14 @@ function nowDefaults(){
   inTime.value = d.toTimeString().slice(0,5);
 }
 
-function showToast(text){ alert(text); }
+function showToast(text){ alert(text); } 
 
 function updateStats(){
   statTotal.textContent = members.length;
   statPresent.textContent = currentSession.presentPhones.length;
-  statAbsent.textContent = Math.max(0, members.length - currentSession.presentPhones.length);
+  statAbsent.textContent = currentSession.active
+    ? Math.max(0, members.length - currentSession.presentPhones.length)
+    : 0;
   pillSession.innerHTML = currentSession.active
     ? `<span class='text-dark bg-warning badge'>Active: ${currentSession.date} ${currentSession.time}</span>`
     : `<span class='badge bg-secondary'>No Active Session</span>`;
@@ -286,7 +289,7 @@ function renderMembers(){
         <span class="badge ${present ? 'bg-success' : 'bg-secondary'} present-pill">${present ? 'Present' : 'Absent'}</span>
       </span>
       <div class="d-flex gap-1 flex-wrap">
-        <input type="checkbox" class="form-check-input member-select" data-phone="${m.phone}"/>
+        <input type="checkbox" class="form-check-input member-select" data-phone="${m.phone}" ${!currentSession.active ? '' : ''}/>
       </div>
     `;
     listMembers.appendChild(li);
@@ -300,25 +303,22 @@ function updateNotifyButtonState(){
   const selected = document.querySelectorAll('.member-select:checked').length;
   btnNotifySelected.disabled = selected === 0;
 }
-
 function updateSelectAllState(){
   const all = document.querySelectorAll('.member-select');
   const checked = document.querySelectorAll('.member-select:checked');
   selectAllCheckbox.checked = all.length===checked.length && all.length>0;
 }
-
 selectAllCheckbox.addEventListener('change', ()=>{
-  document.querySelectorAll('.member-select').forEach(cb=>cb.checked=selectAllCheckbox.checked);
+  const checkboxes = document.querySelectorAll('.member-select');
+  checkboxes.forEach(cb=>cb.checked=selectAllCheckbox.checked);
   updateNotifyButtonState();
 });
-
 document.addEventListener('change', e=>{
   if(e.target.classList.contains('member-select')){
     updateNotifyButtonState();
     updateSelectAllState();
   }
 });
-
 btnNotifySelected.addEventListener('click', ()=>{
   const selectedPhones=[...document.querySelectorAll('.member-select:checked')].map(cb=>cb.dataset.phone);
   const selectedMembers=members.filter(m=>selectedPhones.includes(m.phone));
@@ -335,20 +335,15 @@ btnNotifySelected.addEventListener('click', ()=>{
 btnStart.addEventListener('click', ()=>{
   if(!inDate.value||!inTime.value){ showToast('Select date and time'); return; }
   currentSession={active:true,date:inDate.value,time:inTime.value,presentPhones:[]};
-  saveSession(); updateStats(); showToast('Session started'); renderMembers(); renderCalendar();
+  saveSession(); updateStats(); showToast('Session started'); renderMembers();
 });
-
 btnClose.addEventListener('click', ()=>{
   if(!currentSession.active){ showToast('No active session'); return; }
-  // Mark everyone absent who was not present
-  const allPhones = members.map(m=>m.phone);
-  const absentPhones = allPhones.filter(p=>!currentSession.presentPhones.includes(p));
-  currentSession.presentPhones = currentSession.presentPhones.slice(); // leave present as is
-  attendanceHistory.push({...currentSession, absentPhones});
+  const absentees = members.filter(m=>!currentSession.presentPhones.includes(m.phone)).map(m=>m.phone);
+  attendanceHistory.push({...currentSession, absentPhones: absentees});
   currentSession.active=false; saveSession(); saveHistory(); updateStats(); showToast('Session closed');
-  renderMembers(); renderCalendar();
+  renderMembers(); generateCalendar(currentMonth,currentYear);
 });
-
 btnMark.addEventListener('click', ()=>{
   const phone=formatPhoneForWhatsApp(inPhone.value.trim());
   const member=members.find(m=>formatPhoneForWhatsApp(m.phone)===phone);
@@ -361,77 +356,80 @@ btnMark.addEventListener('click', ()=>{
 search.addEventListener('input', renderMembers);
 roleFilter.addEventListener('change', renderMembers);
 
-// ===================== Calendar =====================
-let today = new Date();
-let currentMonth = today.getMonth();
-let currentYear = today.getFullYear();
+// ===================== Calendar & History =====================
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
 
-function renderCalendar(month=currentMonth, year=currentYear){
-  labelMonth.textContent = new Date(year, month).toLocaleString('default', { month:'long', year:'numeric' });
-  calendar.innerHTML = '';
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month+1, 0).getDate();
+function generateCalendar(month, year){
+  calendar.innerHTML='';
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month+1, 0);
+  const monthLabel = firstDay.toLocaleString('default',{month:'long', year:'numeric'});
+  labelMonth.textContent = monthLabel;
 
-  for(let i=0;i<firstDay;i++){
-    calendar.appendChild(document.createElement('div'));
-  }
+  const startDay = firstDay.getDay();
+  for(let i=0;i<startDay;i++){ calendar.appendChild(document.createElement('div')); }
 
-  for(let d=1; d<=daysInMonth; d++){
+  for(let d=1; d<=lastDay.getDate(); d++){
     const dayDiv=document.createElement('div');
     dayDiv.className='day';
-    const dateStr=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    if(attendanceHistory.some(h=>h.date===dateStr)) dayDiv.classList.add('has-record');
+    const dateStr = `${year}-${(month+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
     dayDiv.textContent=d;
+    if(attendanceHistory.some(h=>h.date===dateStr)) dayDiv.classList.add('has-record');
+
     dayDiv.addEventListener('click', ()=>{
       selDate.textContent=dateStr;
       renderHistory(dateStr);
-      document.querySelectorAll('.calendar .day').forEach(el=>el.classList.remove('selected'));
+      document.querySelectorAll('.calendar .day').forEach(dd=>dd.classList.remove('selected'));
       dayDiv.classList.add('selected');
     });
     calendar.appendChild(dayDiv);
   }
 }
+prevMonth.addEventListener('click', ()=>{ currentMonth--; if(currentMonth<0){ currentMonth=11; currentYear--; } generateCalendar(currentMonth,currentYear); });
+nextMonth.addEventListener('click', ()=>{ currentMonth++; if(currentMonth>11){ currentMonth=0; currentYear++; } generateCalendar(currentMonth,currentYear); });
 
-prevMonth.addEventListener('click', ()=>{
-  currentMonth--; if(currentMonth<0){currentMonth=11; currentYear--;}
-  renderCalendar(currentMonth,currentYear);
-});
-
-nextMonth.addEventListener('click', ()=>{
-  currentMonth++; if(currentMonth>11){currentMonth=0; currentYear++;}
-  renderCalendar(currentMonth,currentYear);
-});
-
-// ===================== History =====================
 function renderHistory(dateStr){
   listHistory.innerHTML='';
-  const dayRecord = attendanceHistory.find(h=>h.date===dateStr);
-  if(!dayRecord){ listHistory.innerHTML='<li class="list-group-item">No record</li>'; return; }
+  const record = attendanceHistory.find(h=>h.date===dateStr);
+  if(!record){ listHistory.innerHTML='<li class="list-group-item">No record for this date</li>'; return; }
+  const mode = viewPresent.checked ? 'present' : 'absent';
+  const phonesToShow = mode==='present'?record.presentPhones:record.absentPhones||[];
 
-  const showPresent = viewPresent.checked;
-  const showAbsent = viewAbsent.checked;
-
-  const items=[];
-  if(showPresent){
-    dayRecord.presentPhones.forEach(p=>{
-      const m=members.find(mm=>mm.phone===p);
-      if(m) items.push(`<li class="list-group-item"><i class="bi bi-person-check-fill text-success"></i> ${m.fullName} (${m.phone})</li>`);
-    });
-  }
-  if(showAbsent && dayRecord.absentPhones){
-    dayRecord.absentPhones.forEach(p=>{
-      const m=members.find(mm=>mm.phone===p);
-      if(m) items.push(`<li class="list-group-item"><i class="bi bi-person-x-fill text-danger"></i> ${m.fullName} (${m.phone})</li>`);
-    });
-  }
-  listHistory.innerHTML = items.join('');
+  phonesToShow.forEach(phone=>{
+    const m = members.find(mem=>mem.phone===phone);
+    if(!m) return;
+    const li=document.createElement('li');
+    li.className='list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2';
+    li.innerHTML = `<span>${m.fullName} <span class="badge bg-dark-subtle">${m.role}</span> <i class="bi bi-telephone-fill"></i> ${m.phone}</span>
+                    <input type="checkbox" class="form-check-input history-select" data-phone="${m.phone}" checked />`;
+    listHistory.appendChild(li);
+  });
+  updateHistoryNotifyButtonState();
 }
-
-viewPresent.addEventListener('change', ()=>renderHistory(selDate.textContent));
-viewAbsent.addEventListener('change', ()=>renderHistory(selDate.textContent));
+function updateHistoryNotifyButtonState(){
+  const selected = document.querySelectorAll('.history-select:checked').length;
+  btnNotifySelDate.disabled = selected===0;
+}
+document.addEventListener('change', e=>{
+  if(e.target.classList.contains('history-select')) updateHistoryNotifyButtonState();
+});
+btnNotifySelDate.addEventListener('click', ()=>{
+  const selectedPhones = [...document.querySelectorAll('.history-select:checked')].map(cb=>cb.dataset.phone);
+  const selectedMembers = members.filter(m=>selectedPhones.includes(m.phone));
+  selectedMembers.forEach((m,index)=>{
+    setTimeout(()=>{
+      const msg=`Hello ${m.fullName}, we missed you at church on ${selDate.textContent}. See you next time! 🙏💛`;
+      window.open(`https://wa.me/${formatPhoneForWhatsApp(m.phone)}?text=${encodeURIComponent(msg)}`,'_blank');
+    }, index*500);
+  });
+  showToast(`Sent notifications to ${selectedMembers.length} members`);
+});
+viewPresent.addEventListener('change', ()=>{ if(selDate.textContent!=='—') renderHistory(selDate.textContent); });
+viewAbsent.addEventListener('change', ()=>{ if(selDate.textContent!=='—') renderHistory(selDate.textContent); });
 
 // ===================== Init =====================
-nowDefaults(); updateStats(); renderMembers(); renderCalendar();
+nowDefaults(); updateStats(); renderMembers(); generateCalendar(currentMonth,currentYear);
 document.getElementById('year').textContent=new Date().getFullYear();
 </script>
 </body>
