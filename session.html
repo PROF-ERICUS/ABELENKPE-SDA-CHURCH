@@ -176,7 +176,7 @@ footer { flex-shrink: 0; background-color: #343a40; color: white; padding: 1rem;
           </div>
           <ul id="listHistory" class="list-group" style="max-height:300px; overflow:auto;"></ul>
           <div class="d-grid gap-2 mt-2">
-            <button id="btnNotifySelDate" class="btn btn-warning"><i class="bi bi-megaphone"></i> Notify Absentees for Selected Date</button>
+            <button id="btnNotifySelDate" class="btn btn-warning"><i class="bi bi-megaphone"></i> Notify Selected for Date</button>
           </div>
         </div>
       </div>
@@ -241,7 +241,7 @@ function nowDefaults(){
   inTime.value = d.toTimeString().slice(0,5);
 }
 
-function showToast(text){ alert(text); } 
+function showToast(text){ alert(text); }
 
 function updateStats(){
   statTotal.textContent = members.length;
@@ -249,6 +249,7 @@ function updateStats(){
   statAbsent.textContent = currentSession.active
     ? Math.max(0, members.length - currentSession.presentPhones.length)
     : 0;
+
   pillSession.innerHTML = currentSession.active
     ? `<span class='text-dark bg-warning badge'>Active: ${currentSession.date} ${currentSession.time}</span>`
     : `<span class='badge bg-secondary'>No Active Session</span>`;
@@ -289,7 +290,7 @@ function renderMembers(){
         <span class="badge ${present ? 'bg-success' : 'bg-secondary'} present-pill">${present ? 'Present' : 'Absent'}</span>
       </span>
       <div class="d-flex gap-1 flex-wrap">
-        <input type="checkbox" class="form-check-input member-select" data-phone="${m.phone}" ${!currentSession.active ? '' : ''}/>
+        <input type="checkbox" class="form-check-input member-select" data-phone="${m.phone}" />
       </div>
     `;
     listMembers.appendChild(li);
@@ -298,27 +299,30 @@ function renderMembers(){
   updateSelectAllState();
 }
 
-// ===================== Notify Selected =====================
 function updateNotifyButtonState(){
   const selected = document.querySelectorAll('.member-select:checked').length;
   btnNotifySelected.disabled = selected === 0;
 }
+
 function updateSelectAllState(){
   const all = document.querySelectorAll('.member-select');
   const checked = document.querySelectorAll('.member-select:checked');
   selectAllCheckbox.checked = all.length===checked.length && all.length>0;
 }
+
 selectAllCheckbox.addEventListener('change', ()=>{
   const checkboxes = document.querySelectorAll('.member-select');
   checkboxes.forEach(cb=>cb.checked=selectAllCheckbox.checked);
   updateNotifyButtonState();
 });
+
 document.addEventListener('change', e=>{
   if(e.target.classList.contains('member-select')){
     updateNotifyButtonState();
     updateSelectAllState();
   }
 });
+
 btnNotifySelected.addEventListener('click', ()=>{
   const selectedPhones=[...document.querySelectorAll('.member-select:checked')].map(cb=>cb.dataset.phone);
   const selectedMembers=members.filter(m=>selectedPhones.includes(m.phone));
@@ -337,13 +341,28 @@ btnStart.addEventListener('click', ()=>{
   currentSession={active:true,date:inDate.value,time:inTime.value,presentPhones:[]};
   saveSession(); updateStats(); showToast('Session started'); renderMembers();
 });
+
 btnClose.addEventListener('click', ()=>{
   if(!currentSession.active){ showToast('No active session'); return; }
-  const absentees = members.filter(m=>!currentSession.presentPhones.includes(m.phone)).map(m=>m.phone);
-  attendanceHistory.push({...currentSession, absentPhones: absentees});
-  currentSession.active=false; saveSession(); saveHistory(); updateStats(); showToast('Session closed');
-  renderMembers(); generateCalendar(currentMonth,currentYear);
+
+  const absentees = members.filter(m => !currentSession.presentPhones.includes(m.phone)).map(m=>m.phone);
+
+  attendanceHistory.push({
+    date: currentSession.date,
+    time: currentSession.time,
+    presentPhones: [...currentSession.presentPhones],
+    absentPhones: absentees
+  });
+
+  currentSession.active = false;
+  saveSession();
+  saveHistory();
+  updateStats();
+  showToast('Session closed and saved');
+  renderMembers();
+  generateCalendar(currentMonth, currentYear);
 });
+
 btnMark.addEventListener('click', ()=>{
   const phone=formatPhoneForWhatsApp(inPhone.value.trim());
   const member=members.find(m=>formatPhoneForWhatsApp(m.phone)===phone);
@@ -352,84 +371,101 @@ btnMark.addEventListener('click', ()=>{
   saveSession(); updateStats(); renderMembers(); showToast(`${member.fullName} marked present`);
 });
 
-// ===================== Filters =====================
-search.addEventListener('input', renderMembers);
-roleFilter.addEventListener('change', renderMembers);
+// ===================== Calendar =====================
+let today=new Date();
+let currentMonth=today.getMonth();
+let currentYear=today.getFullYear();
 
-// ===================== Calendar & History =====================
-let currentMonth = new Date().getMonth();
-let currentYear = new Date().getFullYear();
-
-function generateCalendar(month, year){
+function generateCalendar(month,year){
   calendar.innerHTML='';
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month+1, 0);
-  const monthLabel = firstDay.toLocaleString('default',{month:'long', year:'numeric'});
-  labelMonth.textContent = monthLabel;
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  labelMonth.textContent=`${new Date(year,month).toLocaleString('default',{month:'long'})} ${year}`;
 
-  const startDay = firstDay.getDay();
-  for(let i=0;i<startDay;i++){ calendar.appendChild(document.createElement('div')); }
+  for(let i=0;i<firstDay;i++){
+    const div=document.createElement('div');
+    div.className='day';
+    calendar.appendChild(div);
+  }
 
-  for(let d=1; d<=lastDay.getDate(); d++){
-    const dayDiv=document.createElement('div');
-    dayDiv.className='day';
-    const dateStr = `${year}-${(month+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
-    dayDiv.textContent=d;
-    if(attendanceHistory.some(h=>h.date===dateStr)) dayDiv.classList.add('has-record');
-
-    dayDiv.addEventListener('click', ()=>{
-      selDate.textContent=dateStr;
-      renderHistory(dateStr);
-      document.querySelectorAll('.calendar .day').forEach(dd=>dd.classList.remove('selected'));
-      dayDiv.classList.add('selected');
-    });
-    calendar.appendChild(dayDiv);
+  for(let d=1;d<=daysInMonth;d++){
+    const div=document.createElement('div');
+    div.className='day';
+    const dateStr=`${year}-${(month+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+    if(attendanceHistory.find(h=>h.date===dateStr)) div.classList.add('has-record');
+    div.textContent=d;
+    div.addEventListener('click',()=>{ selectDate(dateStr,div); });
+    calendar.appendChild(div);
   }
 }
-prevMonth.addEventListener('click', ()=>{ currentMonth--; if(currentMonth<0){ currentMonth=11; currentYear--; } generateCalendar(currentMonth,currentYear); });
-nextMonth.addEventListener('click', ()=>{ currentMonth++; if(currentMonth>11){ currentMonth=0; currentYear++; } generateCalendar(currentMonth,currentYear); });
 
+function selectDate(dateStr,el){
+  selDate.textContent=dateStr;
+  document.querySelectorAll('.calendar .day').forEach(d=>d.classList.remove('selected'));
+  el.classList.add('selected');
+  renderHistory(dateStr);
+}
+
+// ===================== History =====================
 function renderHistory(dateStr){
   listHistory.innerHTML='';
   const record = attendanceHistory.find(h=>h.date===dateStr);
   if(!record){ listHistory.innerHTML='<li class="list-group-item">No record for this date</li>'; return; }
   const mode = viewPresent.checked ? 'present' : 'absent';
-  const phonesToShow = mode==='present'?record.presentPhones:record.absentPhones||[];
+  const phonesToShow = mode==='present'?record.presentPhones:record.absentPhones;
 
   phonesToShow.forEach(phone=>{
-    const m = members.find(mem=>mem.phone===phone);
+    const m=members.find(mem=>mem.phone===phone);
     if(!m) return;
     const li=document.createElement('li');
     li.className='list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2';
-    li.innerHTML = `<span>${m.fullName} <span class="badge bg-dark-subtle">${m.role}</span> <i class="bi bi-telephone-fill"></i> ${m.phone}</span>
-                    <input type="checkbox" class="form-check-input history-select" data-phone="${m.phone}" checked />`;
+    li.innerHTML=`<span>${m.fullName} <span class="badge bg-dark-subtle">${m.role}</span> <i class="bi bi-telephone-fill"></i> ${m.phone}</span>
+                  <input type="checkbox" class="form-check-input history-select" data-phone="${m.phone}" checked />`;
     listHistory.appendChild(li);
   });
   updateHistoryNotifyButtonState();
 }
+
 function updateHistoryNotifyButtonState(){
   const selected = document.querySelectorAll('.history-select:checked').length;
-  btnNotifySelDate.disabled = selected===0;
+  btnNotifySelDate.disabled = selected === 0;
 }
+
 document.addEventListener('change', e=>{
   if(e.target.classList.contains('history-select')) updateHistoryNotifyButtonState();
 });
-btnNotifySelDate.addEventListener('click', ()=>{
-  const selectedPhones = [...document.querySelectorAll('.history-select:checked')].map(cb=>cb.dataset.phone);
-  const selectedMembers = members.filter(m=>selectedPhones.includes(m.phone));
+
+btnNotifySelDate.addEventListener('click',()=>{
+  const selectedPhones=[...document.querySelectorAll('.history-select:checked')].map(cb=>cb.dataset.phone);
+  const selectedMembers=members.filter(m=>selectedPhones.includes(m.phone));
   selectedMembers.forEach((m,index)=>{
     setTimeout(()=>{
-      const msg=`Hello ${m.fullName}, we missed you at church on ${selDate.textContent}. See you next time! 🙏💛`;
+      const msg=`Hello ${m.fullName}, we missed you at church. See you next time! 🙏💛`;
       window.open(`https://wa.me/${formatPhoneForWhatsApp(m.phone)}?text=${encodeURIComponent(msg)}`,'_blank');
     }, index*500);
   });
   showToast(`Sent notifications to ${selectedMembers.length} members`);
 });
-viewPresent.addEventListener('change', ()=>{ if(selDate.textContent!=='—') renderHistory(selDate.textContent); });
-viewAbsent.addEventListener('change', ()=>{ if(selDate.textContent!=='—') renderHistory(selDate.textContent); });
 
-// ===================== Init =====================
-nowDefaults(); updateStats(); renderMembers(); generateCalendar(currentMonth,currentYear);
+// ===================== Navigation =====================
+prevMonth.addEventListener('click',()=>{
+  currentMonth--; if(currentMonth<0){currentMonth=11; currentYear--;}
+  generateCalendar(currentMonth,currentYear);
+});
+nextMonth.addEventListener('click',()=>{
+  currentMonth++; if(currentMonth>11){currentMonth=0; currentYear++;}
+  generateCalendar(currentMonth,currentYear);
+});
+
+viewPresent.addEventListener('change',()=>{ if(selDate.textContent!=='—') renderHistory(selDate.textContent); });
+viewAbsent.addEventListener('change',()=>{ if(selDate.textContent!=='—') renderHistory(selDate.textContent); });
+
+// ===================== Filters & Init =====================
+search.addEventListener('input', renderMembers);
+roleFilter.addEventListener('change', renderMembers);
+
+nowDefaults(); updateStats(); renderMembers();
+generateCalendar(currentMonth,currentYear);
 document.getElementById('year').textContent=new Date().getFullYear();
 </script>
 </body>
