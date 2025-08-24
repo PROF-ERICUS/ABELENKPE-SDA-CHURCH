@@ -8,36 +8,35 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-   body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; background: #f8f9fa; }
-    header { background-color:#f71717; color: white; padding: 1rem; position: fixed; top: 0; width: 100%; z-index: 1000; display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; transition: all 0.3s ease; }
-    header.shrink { padding: 0.5rem 1rem; }
-    header h3 { margin: 0; font-size: 1.5rem; transition: all 0.3s ease; }
-    header.shrink h3 { font-size: 1.2rem; }
-    nav a { margin: 0.3rem; }
-    main { flex: 1 0 auto; padding: 120px 15px 20px; max-width: 1100px; margin: auto; }
-    .card { margin-bottom: 20px; }
-    footer { flex-shrink: 0; background-color: #343a40; color: white; padding: 1rem; text-align: center; font-size: 0.9rem; }
-    
+body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; background: #f8f9fa; }
+header { background-color:#f71717; color: white; padding: 1rem; position: fixed; top: 0; width: 100%; z-index: 1000; display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; transition: all 0.3s ease; }
+header.shrink { padding: 0.5rem 1rem; }
+header h3 { margin: 0; font-size: 1.5rem; transition: all 0.3s ease; }
+header.shrink h3 { font-size: 1.2rem; }
+nav a { margin: 0.3rem; }
+main { flex: 1 0 auto; padding: 120px 15px 20px; max-width: 1100px; margin: auto; }
+.card { margin-bottom: 20px; }
+footer { flex-shrink: 0; background-color: #343a40; color: white; padding: 1rem; text-align: center; font-size: 0.9rem; }
 
-  #backToTop { position: fixed; bottom: 40px; right: 20px; display: none; z-index: 999; border-radius: 50%; width: 45px; height: 45px; font-size: 24px; line-height: 1; padding: 0; }
-  .stat-card { border-radius:14px; color:#fff; box-shadow:0 8px 20px rgba(0,0,0,.15); }
-  .stat-all { background:linear-gradient(135deg,#ff416c,#ff4b2b); }
-  .stat-present { background:linear-gradient(135deg,#00c6ff,#0072ff); }
-  .stat-absent { background:linear-gradient(135deg,#8e2de2,#4a00e0); }
-  .badge-role { font-size:.8rem; }
-  .present-pill { font-size:.8rem; }
-  .floating-tools { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:999; }
-  .calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
-  .calendar .day { background:#fff; border-radius:8px; border:1px solid #e5e7eb; padding:8px; text-align:center; cursor:pointer; }
-  .calendar .day.has-record { background:linear-gradient(135deg,#f71717,#ff5252); color:#fff; font-weight:600; }
-  .calendar .day.selected { outline:2px solid #212529; }
+#backToTop { position: fixed; bottom: 40px; right: 20px; display: none; z-index: 999; border-radius: 50%; width: 45px; height: 45px; font-size: 24px; line-height: 1; padding: 0; }
+.stat-card { border-radius:14px; color:#fff; box-shadow:0 8px 20px rgba(0,0,0,.15); }
+.stat-all { background:linear-gradient(135deg,#ff416c,#ff4b2b); }
+.stat-present { background:linear-gradient(135deg,#00c6ff,#0072ff); }
+.stat-absent { background:linear-gradient(135deg,#8e2de2,#4a00e0); }
+.badge-role { font-size:.8rem; }
+.present-pill { font-size:.8rem; }
+.floating-tools { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:999; }
+.calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+.calendar .day { background:#fff; border-radius:8px; border:1px solid #e5e7eb; padding:8px; text-align:center; cursor:pointer; }
+.calendar .day.has-record { background:linear-gradient(135deg,#f71717,#ff5252); color:#fff; font-weight:600; }
+.calendar .day.selected { outline:2px solid #212529; }
 </style>
 </head>
 <body>
 <header class="d-flex align-items-center justify-content-between flex-wrap gap-2">
   <h3 class="mb-0">Attendance</h3>
   <nav class="d-flex gap-2 flex-wrap">
-   <a href="index.html" class="btn btn-light btn-sm">Home</a>
+    <a href="index.html" class="btn btn-light btn-sm">Home</a>
     <a href="registration.html" class="btn btn-light btn-sm">Register</a>
     <a href="admin-dash.html" class="btn btn-light btn-sm">Admin</a>
     <a href="session.html" class="btn btn-light btn-sm">Attendance</a>
@@ -45,167 +44,138 @@
 </header>
 
 <main>
-  <h2 class="text-center mb-4">📅 Attendance Session</h2>
+<h2 class="text-center mb-4">📅 Attendance Session</h2>
 
-  <!-- Stats -->
-  <div class="row g-3 mb-3">
-    <div class="col-md-4">
-      <div class="p-3 stat-card stat-all text-center">
-        <i class="bi bi-people-fill fs-1"></i>
-        <div class="fw-semibold">Total Members</div>
-        <div id="statTotal" class="display-6">0</div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="p-3 stat-card stat-present text-center">
-        <i class="bi bi-person-check-fill fs-1"></i>
-        <div class="fw-semibold">Present</div>
-        <div id="statPresent" class="display-6">0</div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="p-3 stat-card stat-absent text-center">
-        <i class="bi bi-person-x-fill fs-1"></i>
-        <div class="fw-semibold">Absent</div>
-        <div id="statAbsent" class="display-6">0</div>
-      </div>
+<!-- Stats -->
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="p-3 stat-card stat-all text-center">
+      <i class="bi bi-people-fill fs-1"></i>
+      <div class="fw-semibold">Total Members</div>
+      <div id="statTotal" class="display-6">0</div>
     </div>
   </div>
-
-  <!-- Session Controls -->
-  <div class="card mb-3">
-    <div class="card-body">
-      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h5 class="mb-0">Session</h5>
-        <div id="pillSession" class="badge bg-secondary">No Active Session</div>
-      </div>
-      <div class="row g-2 mt-2">
-        <div class="col-md-4">
-          <label class="form-label">Date</label>
-          <input id="inDate" type="date" class="form-control" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Time</label>
-          <input id="inTime" type="time" class="form-control" />
-        </div>
-        <div class="col-md-4 d-grid d-md-flex align-items-end gap-2">
-          <button id="btnStart" class="btn btn-primary flex-fill">Start</button>
-          <button id="btnClose" class="btn btn-danger flex-fill">Close & Save</button>
-        </div>
-      </div>
-      <div id="msg" class="mt-2"></div>
+  <div class="col-md-4">
+    <div class="p-3 stat-card stat-present text-center">
+      <i class="bi bi-person-check-fill fs-1"></i>
+      <div class="fw-semibold">Present</div>
+      <div id="statPresent" class="display-6">0</div>
     </div>
   </div>
-
-  <!-- Quick Mark -->
-  <div class="card mb-3">
-    <div class="card-body">
-      <h5 class="card-title">Quick Mark by Phone</h5>
-      <div class="input-group">
-        <input id="inPhone" class="form-control" placeholder="Enter member phone" />
-        <button id="btnMark" class="btn btn-success"><i class="bi bi-check2-square"></i> Mark</button>
-      </div>
-      <small class="text-muted">Tip: you can also click the green buttons in the list below.</small>
+  <div class="col-md-4">
+    <div class="p-3 stat-card stat-absent text-center">
+      <i class="bi bi-person-x-fill fs-1"></i>
+      <div class="fw-semibold">Absent</div>
+      <div id="statAbsent" class="display-6">0</div>
     </div>
   </div>
+</div>
 
-  <!-- Members List -->
-  <div class="card mb-3">
-    <div class="card-body">
-      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-        <h5 class="mb-0">Members</h5>
-        <div class="d-flex gap-2">
-          <input id="search" type="search" class="form-control" placeholder="Search name, phone, role..." />
-          <select id="roleFilter" class="form-select">
-            <option value="">All Roles</option>
-            <option>Class 1</option>
-            <option>Class 2</option>
-            <option>Class 3</option>
-            <option>Class 4</option>
-            <option>Class 5</option>
-            <option>Class 6</option>
-            <option>Class 7</option>
-            <option>Class 8</option>
-            <option>Class 9</option>
-            <option>Class 10</option>
-            <option>Class 11</option>
-            <option>Class 12</option>
-            <option>Other</option>
-          </select>
-        </div>
-      </div>
-      <ul id="listMembers" class="list-group"></ul>
+<!-- Session Controls -->
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h5 class="mb-0">Session</h5>
+      <div id="pillSession" class="badge bg-secondary">No Active Session</div>
     </div>
+    <div class="row g-2 mt-2">
+      <div class="col-md-4">
+        <label class="form-label">Date</label>
+        <input id="inDate" type="date" class="form-control" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Time</label>
+        <input id="inTime" type="time" class="form-control" />
+      </div>
+      <div class="col-md-4 d-grid d-md-flex align-items-end gap-2">
+        <button id="btnStart" class="btn btn-primary flex-fill">Start</button>
+        <button id="btnClose" class="btn btn-danger flex-fill">Close & Save</button>
+      </div>
+    </div>
+    <div id="msg" class="mt-2"></div>
   </div>
+</div>
 
-  <!-- Calendar & History (browse past sessions, see present/absent, notify again) -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h5 class="mb-0">Attendance History</h5>
-        <div class="d-flex gap-2">
-          <button id="btnExportToday" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Export Today</button>
-          <button id="btnExportAbsentees" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Export Absentees</button>
+<!-- Quick Mark -->
+<div class="card mb-3">
+  <div class="card-body">
+    <h5 class="card-title">Quick Mark by Phone</h5>
+    <div class="input-group">
+      <input id="inPhone" class="form-control" placeholder="Enter member phone" />
+      <button id="btnMark" class="btn btn-success"><i class="bi bi-check2-square"></i> Mark</button>
+    </div>
+    <small class="text-muted">Tip: you can also click the green buttons in the list below.</small>
+  </div>
+</div>
+
+<!-- Members List -->
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+      <h5 class="mb-0">Members</h5>
+      <div class="d-flex gap-2">
+        <input id="search" type="search" class="form-control" placeholder="Search name, phone, role..." />
+        <select id="roleFilter" class="form-select">
+          <option value="">All Roles</option>
+          <option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option>
+          <option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option>
+          <option>Class 9</option><option>Class 10</option><option>Class 11</option><option>Class 12</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <ul id="listMembers" class="list-group"></ul>
+  </div>
+</div>
+
+<!-- Calendar & History -->
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h5 class="mb-0">Attendance History</h5>
+      <div class="d-flex gap-2">
+        <button id="btnExportToday" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Export Today</button>
+        <button id="btnExportAbsentees" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Export Absentees</button>
+      </div>
+    </div>
+    <div class="row g-3 mt-1">
+      <div class="col-md-6">
+        <div class="calendar p-2 border rounded bg-white" id="calendar"></div>
+        <div class="mt-2 d-flex justify-content-between">
+          <button id="prevMonth" class="btn btn-sm btn-light">◀ Prev</button>
+          <span id="labelMonth" class="fw-semibold"></span>
+          <button id="nextMonth" class="btn btn-sm btn-light">Next ▶</button>
         </div>
       </div>
-      <div class="row g-3 mt-1">
-        <div class="col-md-6">
-          <div class="calendar p-2 border rounded bg-white" id="calendar"></div>
-          <div class="mt-2 d-flex justify-content-between">
-            <button id="prevMonth" class="btn btn-sm btn-light">◀ Prev</button>
-            <span id="labelMonth" class="fw-semibold"></span>
-            <button id="nextMonth" class="btn btn-sm btn-light">Next ▶</button>
+      <div class="col-md-6">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <div class="fw-semibold">Selected Date: <span id="selDate">—</span></div>
+          <div class="btn-group btn-group-sm" role="group">
+            <input type="radio" class="btn-check" name="viewMode" id="viewPresent" autocomplete="off" checked>
+            <label class="btn btn-outline-success" for="viewPresent">Present</label>
+            <input type="radio" class="btn-check" name="viewMode" id="viewAbsent" autocomplete="off">
+            <label class="btn btn-outline-danger" for="viewAbsent">Absent</label>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <div class="fw-semibold">Selected Date: <span id="selDate">—</span></div>
-            <div class="btn-group btn-group-sm" role="group">
-              <input type="radio" class="btn-check" name="viewMode" id="viewPresent" autocomplete="off" checked>
-              <label class="btn btn-outline-success" for="viewPresent">Present</label>
-              <input type="radio" class="btn-check" name="viewMode" id="viewAbsent" autocomplete="off">
-              <label class="btn btn-outline-danger" for="viewAbsent">Absent</label>
-            </div>
-          </div>
-          <ul id="listHistory" class="list-group" style="max-height:300px; overflow:auto;"></ul>
-          <div class="d-grid gap-2 mt-2">
-            <button id="btnNotifySelDate" class="btn btn-warning"><i class="bi bi-megaphone"></i> Notify Absentees for Selected Date</button>
-          </div>
+        <ul id="listHistory" class="list-group" style="max-height:300px; overflow:auto;"></ul>
+        <div class="d-grid gap-2 mt-2">
+          <button id="btnNotifySelDate" class="btn btn-warning">Notify Selected Absentees</button>
         </div>
       </div>
     </div>
   </div>
+</div>
 
 </main>
-
-<footer>
-  &copy; <span id="year"></span> ABELENKPE SDA CHURCH. All Rights Reserved.
-</footer>
-
-<!-- Floating tools -->
-<div class="floating-tools">
-  <button id="btnNotifyToday" class="btn btn-warning"><i class="bi bi-megaphone"></i> Notify Today</button>
-  <button id="btnPrint" class="btn btn-secondary"><i class="bi bi-printer"></i> Print</button>
-  <button id="btnClearToday" class="btn btn-outline-danger"><i class="bi bi-trash"></i> Clear Today</button>
-</div>
-
-<!-- Toasts -->
-<div class="position-fixed bottom-0 start-50 translate-middle-x p-3" style="z-index: 1100">
-  <div id="toast" class="toast align-items-center text-bg-dark border-0" role="alert">
-    <div class="d-flex">
-      <div id="toastMsg" class="toast-body">Saved.</div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-  </div>
-</div>
+<footer>&copy; <span id="year"></span> ABELENKPE SDA CHURCH. All Rights Reserved.</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// ===================== Local Storage Keys (compatible with your Admin page) =====================
+// ===================== Local Storage Keys =====================
 const LS_KEYS = {
   members: 'members',
-  session: 'currentSession', // { active, date, time, presentPhones: [] }
-  history: 'attendanceHistory' // [ { date, time, presentPhones:[], closedAt } ]
+  session: 'currentSession',
+  history: 'attendanceHistory'
 };
 
 // ===================== State =====================
@@ -218,7 +188,6 @@ const statTotal = document.getElementById('statTotal');
 const statPresent = document.getElementById('statPresent');
 const statAbsent = document.getElementById('statAbsent');
 const pillSession = document.getElementById('pillSession');
-const msg = document.getElementById('msg');
 
 const inDate = document.getElementById('inDate');
 const inTime = document.getElementById('inTime');
@@ -240,16 +209,7 @@ const listHistory = document.getElementById('listHistory');
 const viewPresent = document.getElementById('viewPresent');
 const viewAbsent = document.getElementById('viewAbsent');
 
-const btnNotifyToday = document.getElementById('btnNotifyToday');
 const btnNotifySelDate = document.getElementById('btnNotifySelDate');
-const btnExportToday = document.getElementById('btnExportToday');
-const btnExportAbsentees = document.getElementById('btnExportAbsentees');
-const btnPrint = document.getElementById('btnPrint');
-const btnClearToday = document.getElementById('btnClearToday');
-
-const toastEl = document.getElementById('toast');
-const toastMsg = document.getElementById('toastMsg');
-const toast = new bootstrap.Toast(toastEl, { delay: 2500 });
 
 // ===================== Utils =====================
 const saveMembers = () => localStorage.setItem(LS_KEYS.members, JSON.stringify(members));
@@ -261,8 +221,6 @@ function nowDefaults(){
   inDate.value = d.toISOString().slice(0,10);
   inTime.value = d.toTimeString().slice(0,5);
 }
-
-function showToast(text){ toastMsg.textContent = text; toast.show(); }
 
 function updateStats(){
   statTotal.textContent = members.length;
@@ -311,7 +269,7 @@ function renderMembers(){
   });
 
   listMembers.querySelectorAll('.btn-toggle').forEach(btn => btn.addEventListener('click', () => {
-    if (!currentSession.active){ showToast('Start a session first.'); return; }
+    if (!currentSession.active){ alert('Start a session first.'); return; }
     const phone = btn.getAttribute('data-phone');
     const i = currentSession.presentPhones.indexOf(phone);
     if (i === -1) currentSession.presentPhones.push(phone); else currentSession.presentPhones.splice(i,1);
@@ -319,18 +277,7 @@ function renderMembers(){
   }));
 }
 
-// ===================== Quick mark =====================
-btnMark.addEventListener('click', () => {
-  if (!currentSession.active){ showToast('Start a session first.'); return; }
-  const phone = (inPhone.value || '').trim();
-  if (!phone){ return; }
-  const m = members.find(x => x.phone === phone);
-  if (!m){ showToast('Member not found'); return; }
-  if (!isPresent(phone)) currentSession.presentPhones.push(phone);
-  saveSession(); updateStats(); renderMembers(); inPhone.value=''; showToast('Marked present');
-});
-
-// ===================== Session controls =====================
+// ===================== Session Controls =====================
 btnStart.addEventListener('click', () => {
   currentSession = {
     active: true,
@@ -338,109 +285,21 @@ btnStart.addEventListener('click', () => {
     time: inTime.value || new Date().toTimeString().slice(0,5),
     presentPhones: []
   };
-  saveSession(); updateStats(); renderMembers(); showToast('Session started');
+  saveSession(); updateStats(); renderMembers(); alert('Session started');
 });
 
 btnClose.addEventListener('click', () => {
-  if (!currentSession.active){ showToast('No active session'); return; }
-  attendanceHistory.push({ ...currentSession, closedAt: new Date().toISOString() });
+  if (!currentSession.active){ alert('No active session'); return; }
+  // Add absentees automatically
+  const allPhones = members.map(m=>m.phone);
+  const absentPhones = allPhones.filter(p=>!currentSession.presentPhones.includes(p));
+  attendanceHistory.push({ ...currentSession, absentPhones, closedAt: new Date().toISOString(), active:false });
   saveHistory();
-  // Reset session
   currentSession = { active:false, date:null, time:null, presentPhones:[] };
-  saveSession(); updateStats(); renderMembers();
-  buildCalendar();
-  showToast('Session closed and saved');
+  saveSession(); updateStats(); renderMembers(); buildCalendar(); alert('Session closed and saved');
 });
 
-// ===================== Export & Print =====================
-function exportXlsx(filename, rows){
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.json_to_sheet(rows);
-  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-  XLSX.writeFile(wb, filename);
-}
-
-btnExportToday.addEventListener('click', () => {
-  const s = currentSession.active ? currentSession : attendanceHistory.at(-1);
-  if (!s){ showToast('No session data'); return; }
-  const rows = members.map(m => ({
-    FullName: m.fullName,
-    Phone: m.phone,
-    Role: m.role,
-    Status: s.presentPhones.includes(m.phone) ? 'Present' : 'Absent',
-    Date: s.date, Time: s.time
-  }));
-  exportXlsx('attendance_'+s.date+'.xlsx', rows);
-});
-
-btnExportAbsentees.addEventListener('click', () => {
-  const s = currentSession.active ? currentSession : attendanceHistory.at(-1);
-  if (!s){ showToast('No session data'); return; }
-  const rows = members.filter(m => !s.presentPhones.includes(m.phone)).map(m => ({
-    FullName: m.fullName, Phone: m.phone, Role: m.role, Date: s.date, Time: s.time
-  }));
-  exportXlsx('absentees_'+s.date+'.xlsx', rows);
-});
-
-btnPrint.addEventListener('click', () => {
-  const s = currentSession.active ? currentSession : attendanceHistory.at(-1);
-  if (!s){ showToast('No session data'); return; }
-  const lines = members.map(m => `${s.presentPhones.includes(m.phone) ? '✔' : '✖'}  ${m.fullName}  (${m.phone})  – ${m.role}`).join('\n');
-  const w = window.open('', '', 'width=700,height=800');
-  w.document.write(`<pre style="font:14px/1.4 monospace">Attendance – ${s.date} ${s.time}\n\n${lines}</pre>`);
-  w.document.close();
-  w.print();
-});
-
-btnClearToday.addEventListener('click', () => {
-  if (!confirm('Clear current session (unsaved)?')) return;
-  currentSession.presentPhones = [];
-  saveSession(); updateStats(); renderMembers(); showToast('Cleared present list');
-});
-
-// ===================== Notifications =====================
-function absenteePhonesForSession(s){
-  return members.filter(m => !s.presentPhones.includes(m.phone)).map(m => m.phone);
-}
-
-function defaultNotifyMessage(date){
-  return `Hello, we missed you at church on ${date}. Hope you are well. — ABELENKPE SDA CHURCH`;
-}
-
-function openWhatsAppBulk(phones, text){
-  // WhatsApp doesn't support true multi-recipient links in one URL.
-  // We open a tab for the first 5 numbers to make it practical.
-  const list = phones.slice(0, 5);
-  list.forEach(p => window.open(`https://wa.me/${p.replace(/[^0-9]/g,'')}?text=${encodeURIComponent(text)}`, '_blank'));
-}
-
-function openSMSBulk(phones, text){
-  // Many devices allow comma-separated numbers; behavior varies by OS.
-  const to = phones.slice(0, 10).join(',');
-  window.location.href = `sms:${to}?&body=${encodeURIComponent(text)}`;
-}
-
-btnNotifyToday.addEventListener('click', () => {
-  const s = currentSession.active ? currentSession : attendanceHistory.at(-1);
-  if (!s){ showToast('No session to notify'); return; }
-  const phones = absenteePhonesForSession(s);
-  if (!phones.length){ showToast('Everyone was present.'); return; }
-  const text = defaultNotifyMessage(s.date);
-  if (confirm('Send WhatsApp messages to first few absentees?')) openWhatsAppBulk(phones, text);
-});
-
-btnNotifySelDate.addEventListener('click', () => {
-  const date = selDate.textContent;
-  if (!date || date === '—'){ showToast('Pick a date in the calendar.'); return; }
-  const s = attendanceHistory.find(x => x.date === date);
-  if (!s){ showToast('No records for selected date'); return; }
-  const phones = absenteePhonesForSession(s);
-  if (!phones.length){ showToast('No absentees for selected date'); return; }
-  const text = defaultNotifyMessage(date);
-  if (confirm('Open SMS app for absentees?')) openSMSBulk(phones, text);
-});
-
-// ===================== Calendar / History =====================
+// ===================== Calendar =====================
 let calMonth = (new Date()).getMonth();
 let calYear = (new Date()).getFullYear();
 
@@ -449,64 +308,76 @@ function buildCalendar(){
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const days = new Date(calYear, calMonth+1, 0).getDate();
   labelMonth.textContent = `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
-  for (let i=0;i<firstDay;i++) calendar.appendChild(Object.assign(document.createElement('div'),{className:'day'}));
+  for (let i=0;i<firstDay;i++) calendar.appendChild(document.createElement('div'));
   for (let d=1; d<=days; d++){
     const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const has = attendanceHistory.some(s => s.date === dateStr);
-    const div = document.createElement('div');
-    div.className = 'day' + (has ? ' has-record' : '');
-    div.textContent = d;
-    div.title = dateStr;
-    div.addEventListener('click', () => selectCalendarDate(dateStr, div));
-    calendar.appendChild(div);
+    const dayDiv = document.createElement('div');
+    dayDiv.className = 'day';
+    dayDiv.textContent = d;
+    if (attendanceHistory.find(h=>h.date===dateStr)) dayDiv.classList.add('has-record');
+    dayDiv.addEventListener('click', ()=>{ selDate.textContent=dateStr; renderHistoryList(dateStr); document.querySelectorAll('.calendar .day').forEach(dd=>dd.classList.remove('selected')); dayDiv.classList.add('selected'); });
+    calendar.appendChild(dayDiv);
   }
 }
 
-function selectCalendarDate(dateStr, el){
-  calendar.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
-  el.classList.add('selected');
-  selDate.textContent = dateStr;
-  renderHistoryList(dateStr);
-}
+prevMonth.addEventListener('click', ()=>{ calMonth--; if(calMonth<0){ calMonth=11; calYear--; } buildCalendar(); });
+nextMonth.addEventListener('click', ()=>{ calMonth++; if(calMonth>11){ calMonth=0; calYear++; } buildCalendar(); });
 
+// ===================== History List =====================
 function renderHistoryList(dateStr){
   listHistory.innerHTML = '';
-  const s = attendanceHistory.find(x => x.date === dateStr);
-  if (!s){ listHistory.innerHTML = `<li class='list-group-item'>No records.</li>`; return; }
+  const s = attendanceHistory.find(x=>x.date===dateStr);
+  if(!s){ listHistory.innerHTML=`<li class='list-group-item'>No records.</li>`; btnNotifySelDate.disabled=true; return; }
+
   const showAbsent = viewAbsent.checked;
-  const list = members.filter(m => showAbsent ? !s.presentPhones.includes(m.phone) : s.presentPhones.includes(m.phone));
-  if (!list.length){ listHistory.innerHTML = `<li class='list-group-item'>No ${showAbsent?'absentees':'present'} on this date.</li>`; return; }
-  list.forEach(m => {
-    const li = document.createElement('li');
-    li.className = 'list-group-item d-flex justify-content-between align-items-center';
-    li.innerHTML = `<span>${m.fullName} <span class='text-muted'>(${m.phone}) — ${m.role}</span></span>`;
+  const list = showAbsent ? members.filter(m=>!s.presentPhones.includes(m.phone)) : members.filter(m=>s.presentPhones.includes(m.phone));
+  if(!list.length){ listHistory.innerHTML=`<li class='list-group-item'>No ${showAbsent?'absentees':'present'} on this date.</li>`; btnNotifySelDate.disabled=true; return; }
+
+  list.forEach(m=>{
+    const li=document.createElement('li');
+    li.className='list-group-item d-flex justify-content-between align-items-center';
+    if(showAbsent && !s.active){
+      li.innerHTML=`<input type="checkbox" class="history-checkbox me-2" data-phone="${m.phone}"> ${m.fullName} <span class='text-muted'>(${m.phone}) — ${m.role}</span>`;
+    } else {
+      li.innerHTML=`${m.fullName} <span class='text-muted'>(${m.phone}) — ${m.role}</span>`;
+    }
     listHistory.appendChild(li);
   });
+  btnNotifySelDate.disabled = !(showAbsent && !s.active && list.length>0);
 }
 
-viewPresent.addEventListener('change', () => renderHistoryList(selDate.textContent));
-viewAbsent.addEventListener('change', () => renderHistoryList(selDate.textContent));
-prevMonth.addEventListener('click', () => { calMonth--; if (calMonth<0){ calMonth=11; calYear--; } buildCalendar(); });
-nextMonth.addEventListener('click', () => { calMonth++; if (calMonth>11){ calMonth=0; calYear++; } buildCalendar(); });
+viewPresent.addEventListener('change', ()=>{ if(viewPresent.checked) renderHistoryList(selDate.textContent); });
+viewAbsent.addEventListener('change', ()=>{ if(viewAbsent.checked) renderHistoryList(selDate.textContent); });
+
+// ===================== Notify Selected Absentees =====================
+btnNotifySelDate.addEventListener('click', ()=>{
+  const checkedBoxes = document.querySelectorAll('.history-checkbox:checked');
+  if(!checkedBoxes.length){ alert('No members selected'); return; }
+  const selectedMembers = Array.from(checkedBoxes).map(cb=>members.find(m=>m.phone===cb.dataset.phone));
+  selectedMembers.forEach((m,i)=>{
+    setTimeout(()=>{
+      const msg=`Hello ${m.fullName}, we missed you at church on ${selDate.textContent}!`;
+      const waUrl=`https://wa.me/${m.phone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl,'_blank');
+    }, i*500);
+  });
+  alert(`Sent messages to ${selectedMembers.length} member(s)`);
+});
+
+// ===================== Quick Mark by Phone =====================
+btnMark.addEventListener('click', ()=>{
+  if(!currentSession.active){ alert('Start a session first'); return; }
+  const p=inPhone.value.trim(); if(!p){ alert('Enter phone'); return; }
+  const idx = currentSession.presentPhones.indexOf(p);
+  if(idx===-1) currentSession.presentPhones.push(p); else alert('Already marked present'); saveSession(); updateStats(); renderMembers();
+});
 
 // ===================== Init =====================
-(function init(){
-  document.getElementById('year').textContent = new Date().getFullYear();
-  if (!members.length){
-    // Seed demo members if none exist
-    members = [
-      { fullName:'John Doe', role:'Class 1', phone:'0541111111', gender:'Male' },
-      { fullName:'Mary Ann', role:'Class 5', phone:'0542222222', gender:'Female' },
-      { fullName:'Peter Smith', role:'Other', phone:'0543333333', gender:'Male' }
-    ];
-    saveMembers();
-  }
-  nowDefaults();
-  updateStats();
-  renderMembers();
-  buildCalendar();
-})();
+document.getElementById('year').textContent=new Date().getFullYear();
+nowDefaults();
+updateStats();
+renderMembers();
+buildCalendar();
 </script>
 </body>
 </html>
-
