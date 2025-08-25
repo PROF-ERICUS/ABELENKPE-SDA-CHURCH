@@ -254,7 +254,52 @@
   }
 
   setInterval(changeBackground, 5000);
+
+
+  // Function to get time-based greeting
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good Morning";
+  if (hour < 18) return "Good Afternoon";
+  return "Good Evening";
+}
+
+// Show greeting after 1 second, slide in, then disappear after 8 seconds
+setTimeout(() => {
+  const greetingContainer = document.createElement('h3'); // smaller than h2
+  greetingContainer.textContent = `${getGreeting()}! Welcome to Abelenkpe SDA Church`;
+  
+  // Styling
+  greetingContainer.style.textShadow = "1px 1px 3px rgba(0,0,0,0.6)";
+  greetingContainer.style.marginBottom = "20px";
+  greetingContainer.style.fontSize = "20px";
+  greetingContainer.style.fontWeight = "600";
+  greetingContainer.style.position = "relative";
+  greetingContainer.style.left = "-100%";  // start outside
+  greetingContainer.style.transition = "left 1s ease-in-out, opacity 1s ease-in-out";
+  greetingContainer.style.opacity = 0;
+
+  document.querySelector("main").prepend(greetingContainer);
+
+  // Slide in + fade in
+  setTimeout(() => {
+    greetingContainer.style.left = "0";
+    greetingContainer.style.opacity = 1;
+  }, 100);
+
+  // After 8 seconds, slide out + fade out
+  setTimeout(() => {
+    greetingContainer.style.left = "100%";
+    greetingContainer.style.opacity = 0;
+    setTimeout(() => {
+      greetingContainer.remove();
+    }, 1000); // remove after slide out
+  }, 8000);
+
+}, 1000);
+
 </script>
 </body>
 </html>
+
 
